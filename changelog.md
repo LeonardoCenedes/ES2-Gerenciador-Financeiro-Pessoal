@@ -31,12 +31,10 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
 
 ---
 
-## [0.1.0] - 18-08-2025
+## [0.7.0] - 01-00-2025
 
 ### Adicionado
-- FIN-0001 **MAJOR** Inicialização do projeto Gerenciador Financeiro Pessoal
-- FIN-0001 **MAJOR** Criação da estrutura de diretórios (Analise, Codigo, Gerencia, SQA)
-- FIN-0001 **MINOR** Adição de arquivos placeholder para manter a estrutura de diretórios
+ - FIN-18 **MAJOR** Adicionado Relatorio de Erros do Documento de Requisitos V2 (refatorado)
 
 ### Alterado
 
@@ -44,34 +42,10 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
 
 ---
 
-## [0.2.0] - 18-08-2025
+## [0.6.0] - 28-08-2025
 
 ### Adicionado
-- FIN-0002 **MAJOR** Adicionada a versão inicial do gráfico de gantt
-
-### Alterado
-
-### Corrigido
-
----
-
-## [0.3.0] - 19-08-2025
-
-### Adicionado
-
-
-### Alterado
-- FIN-0002 **MINOR** Adição de tarefas da sprint 2
-
-### Corrigido
-- FIN-0002 **MINOR** Gantt para o padrão do Jira
-
----
-
-## [0.4.0] - 25-08-2025
-
-### Adicionado
- - FIN-04 **MAJOR** Adicionado Documento de Requisitos V1
+ - FIN-18 **MAJOR** Adicionado Documento de Requisitos V2 (refatorado)
 
 ### Alterado
 
@@ -90,10 +64,46 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
 
 ---
 
-## [0.6.0] - 28-08-2025
+## [0.4.0] - 25-08-2025
 
 ### Adicionado
- - FIN-18 **MAJOR** Adicionado Documento de Requisitos V2 (refatorado)
+ - FIN-04 **MAJOR** Adicionado Documento de Requisitos V1
+
+### Alterado
+
+### Corrigido
+
+---
+
+## [0.3.0] - 19-08-2025
+
+### Adicionado
+
+### Alterado
+- FIN-0002 **MINOR** Adição de tarefas da sprint 2
+
+### Corrigido
+- FIN-0002 **MINOR** Gantt para o padrão do Jira
+
+---
+
+## [0.2.0] - 18-08-2025
+
+### Adicionado
+- FIN-0002 **MAJOR** Adicionada a versão inicial do gráfico de gantt
+
+### Alterado
+
+### Corrigido
+
+---
+
+## [0.1.0] - 18-08-2025
+
+### Adicionado
+- FIN-0001 **MAJOR** Inicialização do projeto Gerenciador Financeiro Pessoal
+- FIN-0001 **MAJOR** Criação da estrutura de diretórios (Analise, Codigo, Gerencia, SQA)
+- FIN-0001 **MINOR** Adição de arquivos placeholder para manter a estrutura de diretórios
 
 ### Alterado
 
