@@ -31,7 +31,18 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
 
 ---
 
-## [0.7.0] - 01-00-2025
+## [0.8.0] - 02-09-2025
+
+### Adicionado
+ - FIN-20 **MAJOR** Adicionado Documento de Requisitos V2
+
+### Alterado
+
+### Corrigido
+
+---
+
+## [0.7.0] - 01-09-2025
 
 ### Adicionado
  - FIN-18 **MAJOR** Adicionado Relatorio de Erros do Documento de Requisitos V2 (refatorado)
