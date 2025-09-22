@@ -31,6 +31,13 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
 
 ---
 
+## [0.10.0] - 19-09-2025
+
+### Adicionado
+ - FIN-13 **MAJOR** Adicionado Diagrama de Casos de Uso V1
+
+---
+
 ## [0.9.0] - 02-09-2025
 
 ### Adicionado
