@@ -31,6 +31,14 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
 
 ---
 
+## [1.0.0] - 21-09-2025
+
+### Adicionado
+ - FIN-12 **PATCH** Adicionado Rede de Tarefas
+
+
+---
+
 ## [0.10.0] - 19-09-2025
 
 ### Adicionado
