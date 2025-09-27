@@ -31,6 +31,12 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
 
 ---
 
+## [1.1.0] - 27-09-2025
+
+### Adicionado
+ - FIN-31 **PATCH** Adicionado Relatório de Defeitos - Casos de Uso Expandido
+
+
 ## [1.0.0] - 21-09-2025
 
 ### Adicionado
