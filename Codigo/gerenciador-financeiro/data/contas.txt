@@ -1,15 +1,17 @@
 1;teste;Conta Corrente;1000.0;BRL
-2;Teste2;Poupança;2000.0;BRL
 3;Teste;Poupança;1000.0;BRL
 4;Outro teste;Cartão de Crédito;1500.0;BRL
 5;Conta Corrente Itaú;Conta Corrente;5000.0;BRL
-6;Poupança Caixa;Poupança;1500.0;BRL
+6;Poupança Inter;Poupança;1500.0;BRL
 7;Cartão Nubank;Cartão de Crédito;0.0;BRL
-8;Conta Corrente Itaú;Conta Corrente;5000.0;BRL
 9;Poupança Caixa;Poupança;1500.0;BRL
 10;Cartão Nubank;Cartão de Crédito;0.0;BRL
 11;Ultima conta teste;Conta Corrente;111.0;BRL
 12;Ultimo2;Empréstimo;2222.0;BRL
 13;Conta Teste 1;Conta Corrente;1000.0;BRL
-14;Conta Teste 2;Poupança;2000.0;BRL
+14;Conta Corrente;Conta Corrente;25000.0;BRL
 15;Conta Teste 3;Cartão de Crédito;0.0;BRL
+17;Conta Corrente Itaú;Conta Corrente;5000.0;BRL
+18;Poupança Caixa;Poupança;1500.0;BRL
+19;Cartão Nubank;Cartão de Crédito;0.0;BRL
+20;Conta Editada;Poupança;2500.0;BRL

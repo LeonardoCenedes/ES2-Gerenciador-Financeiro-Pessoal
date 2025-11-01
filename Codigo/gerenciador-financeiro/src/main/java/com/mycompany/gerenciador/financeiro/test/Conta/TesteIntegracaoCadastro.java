@@ -1,4 +1,4 @@
-package com.mycompany.gerenciador.financeiro.test;
+package com.mycompany.gerenciador.financeiro.test.Conta;
 
 import com.mycompany.gerenciador.financeiro.controller.ContaController;
 import com.mycompany.gerenciador.financeiro.model.Conta;
@@ -77,36 +77,39 @@ public class TesteIntegracaoCadastro {
     
     private static void testarValidacoes() {
         System.out.println("TESTE 3: Validações");
-        ContaController controller = new ContaController();
-        
-        // Teste 3.1: Nome vazio
+
         try {
-            controller.cadastrarConta("", "Conta Corrente", 1000.0, "BRL");
-            System.out.println("X -- ERRO: Deveria ter rejeitado nome vazio");
-        } catch (IllegalArgumentException e) {
-            System.out.println("OK -- Nome vazio rejeitado corretamente: " + e.getMessage());
+            ContaController controller = new ContaController();
+
+            // Teste 3.1: Nome vazio
+            try {
+                controller.cadastrarConta("", "Conta Corrente", 1000.0, "BRL");
+                System.out.println("X -- ERRO: Deveria ter rejeitado nome vazio");
+            } catch (IllegalArgumentException e) {
+                System.out.println("OK -- Nome vazio rejeitado corretamente: " + e.getMessage());
+            }
+
+            // Teste 3.2: Saldo negativo
+            try {
+                controller.cadastrarConta("Conta Teste", "Poupança", -500.0, "BRL");
+                System.out.println("X -- ERRO: Deveria ter rejeitado saldo negativo");
+            } catch (IllegalArgumentException e) {
+                System.out.println("OK -- Saldo negativo rejeitado corretamente: " + e.getMessage());
+            }
+
+            // Teste 3.3: Tipo vazio
+            try {
+                controller.cadastrarConta("Conta Teste", "", 1000.0, "BRL");
+                System.out.println("X -- ERRO: Deveria ter rejeitado tipo vazio");
+            } catch (IllegalArgumentException e) {
+                System.out.println("OK -- Tipo vazio rejeitado corretamente: " + e.getMessage());
+            }
+
         } catch (Exception e) {
-            System.out.println("X -- ERRO inesperado: " + e.getMessage());
+            System.out.println("✗ ERRO ao inicializar controller: " + e.getMessage());
         }
-        
-        // Teste 3.2: Saldo negativo
-        try {
-            controller.cadastrarConta("Conta Teste", "Poupança", -500.0, "BRL");
-            System.out.println("X -- ERRO: Deveria ter rejeitado saldo negativo");
-        } catch (IllegalArgumentException e) {
-            System.out.println("OK -- Saldo negativo rejeitado corretamente: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("X -- ERRO inesperado: " + e.getMessage());
-        }
-        
-        // Teste 3.3: Tipo vazio
-        try {
-            controller.cadastrarConta("Conta Teste", "", 1000.0, "BRL");
-            System.out.println("X -- ERRO: Deveria ter rejeitado tipo vazio");
-        } catch (IllegalArgumentException e) {
-            System.out.println("OK -- Tipo vazio rejeitado corretamente: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("X -- ERRO inesperado: " + e.getMessage());
-        }
+
+        System.out.println();
     }
+
 }

@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.gerenciador.financeiro.test;
+package com.mycompany.gerenciador.financeiro.test.Conta;
 
 import com.mycompany.gerenciador.financeiro.controller.ContaController;
 import com.mycompany.gerenciador.financeiro.model.Conta;

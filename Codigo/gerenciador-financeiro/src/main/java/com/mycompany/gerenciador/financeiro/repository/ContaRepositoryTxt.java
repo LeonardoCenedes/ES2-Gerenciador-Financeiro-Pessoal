@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContaRepositoryTxt {
-    
+
     private static final String DIRETORIO = "data";
     private static final String ARQUIVO = "data/contas.txt";
     private static final String SEPARADOR = ";";
@@ -44,13 +44,13 @@ public class ContaRepositoryTxt {
 
     private int gerarProximoId() throws IOException {
         File arquivo = new File(ARQUIVO);
-        
+
         if (!arquivo.exists()) {
             return 1;
         }
 
         int maiorId = 0;
-        
+
         try (BufferedReader reader = new BufferedReader(new FileReader(ARQUIVO))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
@@ -68,17 +68,17 @@ public class ContaRepositoryTxt {
     }
 
     private String formatarContaParaLinha(Conta conta) {
-        return conta.getId() + SEPARADOR +
-               conta.getNome() + SEPARADOR +
-               conta.getTipo() + SEPARADOR +
-               conta.getSaldoInicial() + SEPARADOR +
-               conta.getMoeda();
+        return conta.getId() + SEPARADOR
+                + conta.getNome() + SEPARADOR
+                + conta.getTipo() + SEPARADOR
+                + conta.getSaldoInicial() + SEPARADOR
+                + conta.getMoeda();
     }
 
     /**
-     * Lista todas as contas do arquivo.
-     * Implementação do RF001.2 - Visualizar Conta Financeira.
-     * 
+     * Lista todas as contas do arquivo. Implementação do RF001.2 - Visualizar
+     * Conta Financeira.
+     *
      * @return Lista de contas cadastradas (vazia se arquivo não existir)
      * @throws IOException se houver erro na leitura do arquivo
      */
@@ -105,12 +105,12 @@ public class ContaRepositoryTxt {
     }
 
     /**
-     * Converte uma linha do arquivo em um objeto Conta.
-     * Formato esperado: id;nome;tipo;saldoInicial;moeda
+     * Converte uma linha do arquivo em um objeto Conta. Formato esperado:
+     * id;nome;tipo;saldoInicial;moeda
      */
     private Conta parsearLinha(String linha) {
         String[] partes = linha.split(SEPARADOR);
-        
+
         int id = Integer.parseInt(partes[0]);
         String nome = partes[1];
         String tipo = partes[2];
@@ -118,5 +118,23 @@ public class ContaRepositoryTxt {
         String moeda = partes[4];
 
         return new Conta(id, nome, tipo, saldoInicial, moeda);
+    }
+
+    /**
+     * Sobrescreve completamente o arquivo com a lista de contas fornecida.
+     * Usado para atualizar contas existentes.
+     *
+     * @param contas Lista completa de contas a ser salva
+     * @throws IOException se houver erro ao escrever no arquivo
+     */
+    public void salvarTodas(List<Conta> contas) throws IOException {
+        // Sobrescreve o arquivo (false = não append)
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO, false))) {
+            for (Conta conta : contas) {
+                String linha = formatarContaParaLinha(conta);
+                writer.write(linha);
+                writer.newLine();
+            }
+        }
     }
 }

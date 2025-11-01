@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
  *
  * @author Laís Isabella
  */
-public class TelaCadastroConta extends javax.swing.JFrame {
+public class TelaCadastroConta extends javax.swing.JFrame  {
 
     private ContaController controller;
 
@@ -19,7 +19,15 @@ public class TelaCadastroConta extends javax.swing.JFrame {
      */
     public TelaCadastroConta() {
         initComponents();
+         try {
         this.controller = new ContaController();
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this,
+            "Erro ao inicializar o controlador de contas: " + e.getMessage(),
+            "Erro de Inicialização",
+            JOptionPane.ERROR_MESSAGE);
+        this.controller = null;
+    }
         configurarTela();
     }
 
@@ -70,6 +78,11 @@ public class TelaCadastroConta extends javax.swing.JFrame {
         jLabel3.setText("Tipo");
 
         cbTipo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Conta Corrente", "Poupança", "Cartão de Crédito", "Empréstimo" }));
+        cbTipo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbTipoActionPerformed(evt);
+            }
+        });
 
         jLabel4.setText("Saldo inicial");
 
@@ -180,6 +193,10 @@ public class TelaCadastroConta extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, "Erro ao salvar conta: " + e.getMessage());
     }
     }//GEN-LAST:event_btnSalvarActionPerformed
+
+    private void cbTipoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbTipoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbTipoActionPerformed
                                          
 
     /**
