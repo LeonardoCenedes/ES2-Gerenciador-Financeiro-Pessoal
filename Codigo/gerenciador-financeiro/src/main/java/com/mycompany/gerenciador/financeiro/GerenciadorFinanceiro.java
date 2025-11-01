@@ -1,0 +1,20 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ */
+package com.mycompany.gerenciador.financeiro;
+
+import com.mycompany.gerenciador.financeiro.view.TelaCadastroConta;
+
+/**
+ * Classe principal do sistema Gerenciador Financeiro Pessoal.
+ * 
+ * @author Laís Isabella
+ */
+public class GerenciadorFinanceiro {
+    
+    public static void main(String[] args) {
+        java.awt.EventQueue.invokeLater(() -> {
+            new TelaCadastroConta().setVisible(true);
+        });
+    }
+}
