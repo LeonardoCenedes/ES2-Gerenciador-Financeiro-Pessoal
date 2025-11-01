@@ -1,55 +1,43 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.gerenciador.financeiro.controller;
 
 import com.mycompany.gerenciador.financeiro.model.Conta;
-import com.mycompany.gerenciador.financeiro.repositoy.ContaRepositoryTxt;
+import com.mycompany.gerenciador.financeiro.repository.ContaRepositoryTxt;
 import java.io.IOException;
+import java.util.List;
 
-
-/**
- *
- * @author Laís Isabella
- */
 public class ContaController {
+    
     private ContaRepositoryTxt repository;
 
-    /**
-     * Construtor que inicializa o repositório
-     */
     public ContaController() {
         this.repository = new ContaRepositoryTxt();
     }
 
     /**
      * Cadastra uma nova conta financeira.
-     * Realiza validações básicas antes de persistir.
-     * 
-     * @param nome Nome da conta
-     * @param tipo Tipo da conta (Conta Corrente, Poupança, etc)
-     * @param saldoInicial Saldo inicial da conta
-     * @param moeda Moeda padrão (BRL, USD, etc)
-     * @throws IllegalArgumentException se alguma validação falhar
-     * @throws IOException se houver erro ao salvar no arquivo
+     * Implementa o caso de uso CE1.1.
      */
     public void cadastrarConta(String nome, String tipo, double saldoInicial, String moeda) 
             throws IllegalArgumentException, IOException {
         
-        // Validações
         validarDados(nome, tipo, saldoInicial, moeda);
 
-        // Cria a nova conta
         Conta novaConta = new Conta(nome, tipo, saldoInicial, moeda);
 
-        // Salva no repositório
         repository.salvar(novaConta);
     }
 
     /**
-     * Valida os dados da conta antes de criar
+     * Lista todas as contas cadastradas.
+     * Implementa o caso de uso CE1.2 - Visualizar Conta Financeira.
+     * 
+     * @return Lista de todas as contas
+     * @throws IOException se houver erro ao ler o arquivo
      */
+    public List<Conta> listarContas() throws IOException {
+        return repository.listar();
+    }
+
     private void validarDados(String nome, String tipo, double saldoInicial, String moeda) 
             throws IllegalArgumentException {
         

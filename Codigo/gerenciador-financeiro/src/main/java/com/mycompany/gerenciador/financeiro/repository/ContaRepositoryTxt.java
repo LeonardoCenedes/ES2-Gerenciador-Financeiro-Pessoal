@@ -2,7 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.gerenciador.financeiro.repositoy;
+package com.mycompany.gerenciador.financeiro.repository;
+
 import com.mycompany.gerenciador.financeiro.model.Conta;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,25 +14,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Laís Isabella
- */
 public class ContaRepositoryTxt {
+    
     private static final String DIRETORIO = "data";
     private static final String ARQUIVO = "data/contas.txt";
     private static final String SEPARADOR = ";";
 
-    /**
-     * Construtor que garante a existência do diretório data
-     */
     public ContaRepositoryTxt() {
         criarDiretorioSeNaoExistir();
     }
 
-    /**
-     * Cria o diretório data se não existir
-     */
     private void criarDiretorioSeNaoExistir() {
         File dir = new File(DIRETORIO);
         if (!dir.exists()) {
@@ -39,16 +31,10 @@ public class ContaRepositoryTxt {
         }
     }
 
-    /**
-     * Salva uma nova conta no arquivo.
-     * Gera automaticamente o ID baseado no último ID existente.
-     */
     public void salvar(Conta conta) throws IOException {
-        // Gera o próximo ID
         int proximoId = gerarProximoId();
         conta.setId(proximoId);
 
-        // Abre o arquivo em modo append
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO, true))) {
             String linha = formatarContaParaLinha(conta);
             writer.write(linha);
@@ -56,13 +42,9 @@ public class ContaRepositoryTxt {
         }
     }
 
-    /**
-     * Gera o próximo ID lendo o arquivo e pegando o maior ID + 1
-     */
     private int gerarProximoId() throws IOException {
         File arquivo = new File(ARQUIVO);
         
-        // Se o arquivo não existe, retorna 1
         if (!arquivo.exists()) {
             return 1;
         }
@@ -85,10 +67,6 @@ public class ContaRepositoryTxt {
         return maiorId + 1;
     }
 
-    /**
-     * Formata uma conta para uma linha do arquivo
-     * Formato: id;nome;tipo;saldoInicial;moeda
-     */
     private String formatarContaParaLinha(Conta conta) {
         return conta.getId() + SEPARADOR +
                conta.getNome() + SEPARADOR +
@@ -98,7 +76,11 @@ public class ContaRepositoryTxt {
     }
 
     /**
-     * Lista todas as contas do arquivo
+     * Lista todas as contas do arquivo.
+     * Implementação do RF001.2 - Visualizar Conta Financeira.
+     * 
+     * @return Lista de contas cadastradas (vazia se arquivo não existir)
+     * @throws IOException se houver erro na leitura do arquivo
      */
     public List<Conta> listar() throws IOException {
         List<Conta> contas = new ArrayList<>();
@@ -123,7 +105,8 @@ public class ContaRepositoryTxt {
     }
 
     /**
-     * Converte uma linha do arquivo em um objeto Conta
+     * Converte uma linha do arquivo em um objeto Conta.
+     * Formato esperado: id;nome;tipo;saldoInicial;moeda
      */
     private Conta parsearLinha(String linha) {
         String[] partes = linha.split(SEPARADOR);
@@ -135,5 +118,5 @@ public class ContaRepositoryTxt {
         String moeda = partes[4];
 
         return new Conta(id, nome, tipo, saldoInicial, moeda);
-    }    
+    }
 }

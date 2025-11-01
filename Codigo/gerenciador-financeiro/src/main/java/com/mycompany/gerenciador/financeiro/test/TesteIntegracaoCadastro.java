@@ -2,7 +2,7 @@ package com.mycompany.gerenciador.financeiro.test;
 
 import com.mycompany.gerenciador.financeiro.controller.ContaController;
 import com.mycompany.gerenciador.financeiro.model.Conta;
-import com.mycompany.gerenciador.financeiro.repositoy.ContaRepositoryTxt;
+import com.mycompany.gerenciador.financeiro.repository.ContaRepositoryTxt;
 import java.util.List;
 
 /**
