@@ -37,16 +37,25 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
  - FIN-32 **MAJOR** Adicionado PDF com todos os diagramas de sequência
 
 
+## [1.3.0] - 20-10-2025
+
+### Adicionado
+ - FIN-22 **MAJOR** Adicionado Casos de Uso Expandido V2 e Ajuste do Documento de Requisitos
+---
+
 ## [1.2.0] - 27-09-2025
 
 ### Adicionado
  - FIN-25 **PATCH** Adicionado Relatório de Defeitos - Diagrama de Casos de Uso 
+
+---
 
 ## [1.1.0] - 27-09-2025
 
 ### Adicionado
  - FIN-31 **PATCH** Adicionado Relatório de Defeitos - Casos de Uso Expandido
 
+---
 
 ## [1.1.0] - 25-09-2025
 
