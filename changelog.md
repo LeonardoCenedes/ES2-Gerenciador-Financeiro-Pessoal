@@ -48,11 +48,17 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
  - FIN-31 **PATCH** Adicionado Relatório de Defeitos - Casos de Uso Expandido
 
 
+## [1.1.0] - 25-09-2025
+
+### Adicionado
+ - FIN-23 **MAJOR** Adicionado Modelo Conceitual V1
+
+---
+
 ## [1.0.0] - 21-09-2025
 
 ### Adicionado
  - FIN-12 **PATCH** Adicionado Rede de Tarefas
-
 
 ---
 
