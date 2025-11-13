@@ -43,6 +43,12 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
  - FIN-22 **MAJOR** Adicionado Casos de Uso Expandido V2 e Ajuste do Documento de Requisitos
 ---
 
+## [2.0.0] - 01-11-2025
+
+### Adicionado
+ - FIN-74 **MAJOR** Adicionando CE01 - Gerenciar Conta Financeira (criação, listagem, edição e exclusão de conta) + testes de integração
+
+
 ## [1.2.0] - 27-09-2025
 
 ### Adicionado
