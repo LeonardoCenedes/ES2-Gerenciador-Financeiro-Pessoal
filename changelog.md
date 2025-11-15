@@ -43,6 +43,13 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
  - FIN-22 **MAJOR** Adicionado Casos de Uso Expandido V2 e Ajuste do Documento de Requisitos
 ---
 
+## [2.1.0] - 14-11-2025
+
+### Adicionado
+ - FIN-89 **MAJOR** Adicionado Casos de Uso Expandido V3
+ - FIN-89 **MAJOR** Adicionado Documento de Requisitos V5
+
+
 ## [2.0.0] - 01-11-2025
 
 ### Adicionado
