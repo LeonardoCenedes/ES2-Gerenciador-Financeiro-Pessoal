@@ -15,3 +15,4 @@
 18;Poupança Caixa;Poupança;1500.0;BRL
 19;Cartão Nubank;Cartão de Crédito;0.0;BRL
 20;Conta Editada;Poupança;2500.0;BRL
+21;Nome da conta;Conta Corrente;133.0;BRL

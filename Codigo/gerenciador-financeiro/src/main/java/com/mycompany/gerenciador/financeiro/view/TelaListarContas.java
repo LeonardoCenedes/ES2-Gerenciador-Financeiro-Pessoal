@@ -6,6 +6,7 @@ package com.mycompany.gerenciador.financeiro.view;
 
 import com.mycompany.gerenciador.financeiro.controller.ContaController;
 import com.mycompany.gerenciador.financeiro.model.Conta;
+import com.mycompany.gerenciador.financeiro.model.Usuario;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -18,11 +19,13 @@ public class TelaListarContas extends javax.swing.JFrame {
 
     private ContaController controller;
     private DefaultTableModel modeloTabela;
+    private Usuario usuarioLogado;
 
     /**
      * Creates new form TelaListarContas
      */
-    public TelaListarContas() {
+    public TelaListarContas(Usuario usuarioLogado) {
+        this.usuarioLogado = usuarioLogado;
         initComponents();
         try {
             this.controller = new ContaController();
@@ -54,7 +57,7 @@ public class TelaListarContas extends javax.swing.JFrame {
     private void configurarTabela() {
         modeloTabela = new DefaultTableModel(
                 new Object[][]{},
-                new String[]{"ID", "Nome", "Tipo", "Saldo Inicial", "Moeda"}
+                new String[]{"Nome", "Tipo", "Saldo Inicial", "Moeda"}
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -77,11 +80,11 @@ public class TelaListarContas extends javax.swing.JFrame {
                 return;
             }
 
-            List<Conta> contas = controller.listarContas();
+            // Busca apenas as contas do usuário logado
+            List<Conta> contas = controller.buscarContasUsuario(usuarioLogado);
 
             for (Conta conta : contas) {
                 Object[] linha = {
-                    conta.getId(),
                     conta.getNome(),
                     conta.getTipo(),
                     String.format("R$ %.2f", conta.getSaldoInicial()),
@@ -202,16 +205,18 @@ public class TelaListarContas extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-        int linha = tblContas.getSelectedRow();
+         int linha = tblContas.getSelectedRow();
 
         if (linha >= 0) {
             try {
-                int id = (int) tblContas.getValueAt(linha, 0);
+                // Pega o nome da conta da linha selecionada (coluna 0 agora é Nome, não ID)
+                String nomeConta = (String) tblContas.getValueAt(linha, 0);
 
-                List<Conta> contas = controller.listarContas();
+                // Busca a conta completa na lista do usuário
+                List<Conta> contas = controller.buscarContasUsuario(usuarioLogado);
                 Conta contaSelecionada = null;
                 for (Conta c : contas) {
-                    if (c.getId() == id) {
+                    if (c.getNome().equals(nomeConta)) {
                         contaSelecionada = c;
                         break;
                     }
@@ -231,13 +236,27 @@ public class TelaListarContas extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
-        int linha = tblContas.getSelectedRow();
+       int linha = tblContas.getSelectedRow();
 
         if (linha >= 0) {
             try {
-                // Pega o ID da linha selecionada
-                int id = (int) tblContas.getValueAt(linha, 0);
-                String nomeConta = (String) tblContas.getValueAt(linha, 1);
+                // Pega o nome da conta da linha selecionada
+                String nomeConta = (String) tblContas.getValueAt(linha, 0);
+
+                // Busca a conta completa
+                List<Conta> contas = controller.buscarContasUsuario(usuarioLogado);
+                Conta contaParaExcluir = null;
+                for (Conta c : contas) {
+                    if (c.getNome().equals(nomeConta)) {
+                        contaParaExcluir = c;
+                        break;
+                    }
+                }
+
+                if (contaParaExcluir == null) {
+                    JOptionPane.showMessageDialog(this, "Conta não encontrada.");
+                    return;
+                }
 
                 // Confirmação de exclusão
                 int opcao = JOptionPane.showConfirmDialog(this,
@@ -248,7 +267,7 @@ public class TelaListarContas extends javax.swing.JFrame {
 
                 if (opcao == JOptionPane.YES_OPTION) {
                     // Exclui a conta
-                    controller.excluirConta(id);
+                    controller.excluirConta(contaParaExcluir);
 
                     // Mensagem de sucesso
                     JOptionPane.showMessageDialog(this, "Conta excluída com sucesso!");
@@ -283,7 +302,8 @@ public class TelaListarContas extends javax.swing.JFrame {
         }
 
         java.awt.EventQueue.invokeLater(() -> {
-            new TelaListarContas().setVisible(true);
+            Usuario usuarioTeste = new Usuario("Teste", "teste@email.com", "123456");
+            new TelaListarContas(usuarioTeste).setVisible(true);
         });
     }
 

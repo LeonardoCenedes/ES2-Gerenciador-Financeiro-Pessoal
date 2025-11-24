@@ -4,6 +4,7 @@
  */
 package com.mycompany.gerenciador.financeiro.view;
 import com.mycompany.gerenciador.financeiro.controller.ContaController;
+import com.mycompany.gerenciador.financeiro.model.Usuario;
 import javax.swing.JOptionPane;
 
 /**
@@ -13,11 +14,13 @@ import javax.swing.JOptionPane;
 public class TelaCadastroConta extends javax.swing.JFrame  {
 
     private ContaController controller;
+    private Usuario usuarioLogado;
 
     /**
      * Creates new form TelaCadastroConta
      */
     public TelaCadastroConta() {
+        this.usuarioLogado = usuarioLogado;
         initComponents();
          try {
         this.controller = new ContaController();
@@ -177,7 +180,7 @@ public class TelaCadastroConta extends javax.swing.JFrame  {
         String moeda = (String) cbMoeda.getSelectedItem();
 
         // Chamar o controller para cadastrar
-        controller.cadastrarConta(nome, tipo, saldoInicial, moeda);
+         controller.criarConta(nome, tipo, saldoInicial, moeda, usuarioLogado);
 
         // Mostrar mensagem de sucesso
         JOptionPane.showMessageDialog(this, "Conta cadastrada com sucesso!");

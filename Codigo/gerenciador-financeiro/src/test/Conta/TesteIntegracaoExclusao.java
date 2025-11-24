@@ -1,8 +1,11 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.mycompany.gerenciador.financeiro.test.Conta;
 
 import com.mycompany.gerenciador.financeiro.controller.ContaController;
 import com.mycompany.gerenciador.financeiro.model.Conta;
-import com.mycompany.gerenciador.financeiro.model.Usuario;
 import java.util.List;
 
 /**
@@ -10,13 +13,8 @@ import java.util.List;
  */
 public class TesteIntegracaoExclusao {
     
-    private static Usuario usuarioTeste;
-    
     public static void main(String[] args) {
         System.out.println("=== INICIANDO TESTE DE INTEGRAÇÃO - EXCLUSÃO ===\n");
-        
-        // Cria usuário de teste para todos os testes
-        usuarioTeste = new Usuario("Pedro Santos", "pedro@email.com", "123456");
         
         // Teste 1: Preparar dados - cadastrar contas para excluir
         prepararDadosTeste();
@@ -41,10 +39,10 @@ public class TesteIntegracaoExclusao {
         try {
             ContaController controller = new ContaController();
             
-            // Cadastra contas para teste (COM USUARIO)
-            controller.criarConta("Conta Excluir 1", "Conta Corrente", 1000.0, "BRL", usuarioTeste);
-            controller.criarConta("Conta Excluir 2", "Poupança", 2000.0, "BRL", usuarioTeste);
-            controller.criarConta("Conta Excluir 3", "Cartão de Crédito", 0.0, "BRL", usuarioTeste);
+            // Cadastra contas para teste
+            controller.criarConta("Conta Excluir 1", "Conta Corrente", 1000.0, "BRL");
+            controller.criarConta("Conta Excluir 2", "Poupança", 2000.0, "BRL");
+            controller.criarConta("Conta Excluir 3", "Cartão de Crédito", 0.0, "BRL");
             
             System.out.println("OK -- 3 contas cadastradas para teste");
             
@@ -59,8 +57,8 @@ public class TesteIntegracaoExclusao {
         try {
             ContaController controller = new ContaController();
             
-            // Lista as contas antes da exclusão (SEM ID)
-            List<Conta> contasAntes = controller.buscarContasUsuario(usuarioTeste);
+            // Lista as contas antes da exclusão
+            List<Conta> contasAntes = controller.listarContas();
             int quantidadeAntes = contasAntes.size();
             
             if (contasAntes.isEmpty()) {
@@ -68,20 +66,21 @@ public class TesteIntegracaoExclusao {
                 return;
             }
             
-            // Pega a última conta para excluir (SEM ID)
+            // Pega a última conta para excluir
             Conta contaParaExcluir = contasAntes.get(contasAntes.size() - 1);
+            int idExcluir = contaParaExcluir.getId();
             String nomeExcluir = contaParaExcluir.getNome();
             
             System.out.println("Conta a ser excluída:");
-            System.out.printf("    Nome: %s | Tipo: %s\n",
-                nomeExcluir, contaParaExcluir.getTipo());
+            System.out.printf("    ID: %d | Nome: %s | Tipo: %s\n",
+                idExcluir, nomeExcluir, contaParaExcluir.getTipo());
             
-            // Exclui a conta (PASSA O OBJETO CONTA, NÃO ID)
-            controller.excluirConta(contaParaExcluir);
+            // Exclui a conta
+            controller.excluirConta(idExcluir);
             System.out.println("OK -- Conta excluída com sucesso");
             
             // Verifica se quantidade diminuiu
-            List<Conta> contasDepois = controller.buscarContasUsuario(usuarioTeste);
+            List<Conta> contasDepois = controller.listarContas();
             int quantidadeDepois = contasDepois.size();
             
             if (quantidadeDepois == quantidadeAntes - 1) {
@@ -103,19 +102,19 @@ public class TesteIntegracaoExclusao {
         try {
             ContaController controller = new ContaController();
             
-            // Lista todas as contas do usuário
-            List<Conta> contas = controller.buscarContasUsuario(usuarioTeste);
+            // Lista todas as contas
+            List<Conta> contas = controller.listarContas();
             
             System.out.println("---------------------------------------------------");
             System.out.println("Contas restantes após exclusão:");
             System.out.println("---------------------------------------------------");
             
             for (Conta conta : contas) {
-                System.out.printf("Nome: %s | Tipo: %s | Saldo: R$ %.2f | Moeda: %s\n",
+                System.out.printf("ID: %d | Nome: %s | Tipo: %s | Saldo: R$ %.2f\n",
+                    conta.getId(),
                     conta.getNome(),
                     conta.getTipo(),
-                    conta.getSaldoInicial(),
-                    conta.getMoeda()
+                    conta.getSaldoInicial()
                 );
             }
             System.out.println("---------------------------------------------------");
@@ -146,12 +145,9 @@ public class TesteIntegracaoExclusao {
         try {
             ContaController controller = new ContaController();
             
-            // Cria uma conta que não existe no sistema (SEM ID)
-            Conta contaInexistente = new Conta("Conta Fantasma", "Poupança", 1000.0, "BRL", usuarioTeste);
-            
-            // Tenta excluir (PASSA O OBJETO CONTA, NÃO ID)
-            controller.excluirConta(contaInexistente);
-            System.out.println("X -- ERRO: Deveria ter lançado exceção para conta inexistente");
+            // Tenta excluir uma conta com ID inexistente (9999)
+            controller.excluirConta(9999);
+            System.out.println("X -- ERRO: Deveria ter lançado exceção para ID inexistente");
             
         } catch (IllegalArgumentException e) {
             System.out.println("OK -- Conta inexistente rejeitada: " + e.getMessage());
@@ -168,7 +164,7 @@ public class TesteIntegracaoExclusao {
             ContaController controller = new ContaController();
             
             // Conta inicial
-            List<Conta> contas = controller.buscarContasUsuario(usuarioTeste);
+            List<Conta> contas = controller.listarContas();
             int quantidadeInicial = contas.size();
             System.out.println("Quantidade inicial de contas: " + quantidadeInicial);
             
@@ -177,18 +173,18 @@ public class TesteIntegracaoExclusao {
                 return;
             }
             
-            // Exclui 2 contas (SEM ID)
-            Conta conta1 = contas.get(contas.size() - 1);
-            Conta conta2 = contas.get(contas.size() - 2);
+            // Exclui 2 contas
+            int id1 = contas.get(contas.size() - 1).getId();
+            int id2 = contas.get(contas.size() - 2).getId();
             
-            controller.excluirConta(conta1);
-            System.out.println("OK -- Primeira conta excluída (Nome: " + conta1.getNome() + ")");
+            controller.excluirConta(id1);
+            System.out.println("OK -- Primeira conta excluída (ID: " + id1 + ")");
             
-            controller.excluirConta(conta2);
-            System.out.println("OK -- Segunda conta excluída (Nome: " + conta2.getNome() + ")");
+            controller.excluirConta(id2);
+            System.out.println("OK -- Segunda conta excluída (ID: " + id2 + ")");
             
             // Verifica quantidade final
-            contas = controller.buscarContasUsuario(usuarioTeste);
+            contas = controller.listarContas();
             int quantidadeFinal = contas.size();
             
             if (quantidadeFinal == quantidadeInicial - 2) {
@@ -199,11 +195,10 @@ public class TesteIntegracaoExclusao {
                 System.out.println("    Esperado: " + (quantidadeInicial - 2) + " | Obtido: " + quantidadeFinal);
             }
             
-            // Verifica integridade dos dados restantes (SEM ID)
+            // Verifica integridade dos dados restantes
             boolean todosValidos = true;
             for (Conta c : contas) {
-                if (c.getNome() == null || c.getNome().isEmpty() || 
-                    c.getUsuario() == null || c.getUsuario().getEmail() == null) {
+                if (c.getId() <= 0 || c.getNome() == null || c.getNome().isEmpty()) {
                     todosValidos = false;
                     break;
                 }

@@ -1,8 +1,11 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.mycompany.gerenciador.financeiro.test.Conta;
 
 import com.mycompany.gerenciador.financeiro.controller.ContaController;
 import com.mycompany.gerenciador.financeiro.model.Conta;
-import com.mycompany.gerenciador.financeiro.model.Usuario;
 import com.mycompany.gerenciador.financeiro.repository.ContaRepositoryTxt;
 import java.util.List;
 
@@ -11,19 +14,14 @@ import java.util.List;
  */
 public class TesteIntegracaoListagem {
     
-    private static Usuario usuarioTeste;
-    
     public static void main(String[] args) {
         System.out.println("=== INICIANDO TESTE DE INTEGRAÇÃO - LISTAGEM ===\n");
-        
-        // Cria usuário de teste para todos os testes
-        usuarioTeste = new Usuario("Ana Costa", "ana@email.com", "123456");
         
         // Teste 1: Preparar dados - cadastrar contas para teste
         prepararDadosTeste();
         
-        // Teste 2: Listar todas as contas do usuário
-        testarListarContasUsuario();
+        // Teste 2: Listar todas as contas
+        testarListarTodasContas();
         
         // Teste 3: Verificar dados das contas listadas
         testarVerificarDadosContas();
@@ -39,10 +37,9 @@ public class TesteIntegracaoListagem {
         try {
             ContaController controller = new ContaController();
             
-            // Cadastra contas COM USUARIO
-            controller.criarConta("Conta Teste 1", "Conta Corrente", 1000.0, "BRL", usuarioTeste);
-            controller.criarConta("Conta Teste 2", "Poupança", 2000.0, "BRL", usuarioTeste);
-            controller.criarConta("Conta Teste 3", "Cartão de Crédito", 0.0, "BRL", usuarioTeste);
+            controller.criarConta("Conta Teste 1", "Conta Corrente", 1000.0, "BRL");
+            controller.criarConta("Conta Teste 2", "Poupança", 2000.0, "BRL");
+            controller.criarConta("Conta Teste 3", "Cartão de Crédito", 0.0, "BRL");
             
             System.out.println("OK -- 3 contas cadastradas para teste");
             
@@ -52,17 +49,15 @@ public class TesteIntegracaoListagem {
         System.out.println();
     }
     
-    private static void testarListarContasUsuario() {
-        System.out.println("TESTE 2: Listar Contas do Usuário via Controller");
+    private static void testarListarTodasContas() {
+        System.out.println("TESTE 2: Listar Todas as Contas via Controller");
         try {
             ContaController controller = new ContaController();
-            
-            // Usa buscarContasUsuario ao invés de listarContas
-            List<Conta> contas = controller.buscarContasUsuario(usuarioTeste);
+            List<Conta> contas = controller.listarContas();
             
             if (contas != null) {
                 System.out.println("OK -- Lista retornada com sucesso");
-                System.out.println("OK -- Total de contas do usuário: " + contas.size());
+                System.out.println("OK -- Total de contas: " + contas.size());
                 
                 if (contas.size() >= 3) {
                     System.out.println("OK -- Todas as contas de teste foram listadas");
@@ -83,7 +78,7 @@ public class TesteIntegracaoListagem {
         System.out.println("TESTE 3: Verificar Dados das Contas Listadas");
         try {
             ContaController controller = new ContaController();
-            List<Conta> contas = controller.buscarContasUsuario(usuarioTeste);
+            List<Conta> contas = controller.listarContas();
             
             System.out.println("---------------------------------------------------");
             System.out.println("Contas listadas:");
@@ -92,21 +87,21 @@ public class TesteIntegracaoListagem {
             boolean todosOsDadosCorretos = true;
             
             for (Conta conta : contas) {
-                // Verifica se todos os campos estão preenchidos (SEM ID)
-                boolean dadosValidos = conta.getNome() != null && !conta.getNome().isEmpty()
+                // Verifica se todos os campos estão preenchidos
+                boolean dadosValidos = conta.getId() > 0 
+                    && conta.getNome() != null && !conta.getNome().isEmpty()
                     && conta.getTipo() != null && !conta.getTipo().isEmpty()
-                    && conta.getMoeda() != null && !conta.getMoeda().isEmpty()
-                    && conta.getUsuario() != null && conta.getUsuario().getEmail() != null;
+                    && conta.getMoeda() != null && !conta.getMoeda().isEmpty();
                 
                 String status = dadosValidos ? "OK" : "X";
                 
-                System.out.printf("[%s] Nome: %s | Tipo: %s | Saldo: R$ %.2f | Moeda: %s | Usuário: %s\n",
+                System.out.printf("[%s] ID: %d | Nome: %s | Tipo: %s | Saldo: R$ %.2f | Moeda: %s\n",
                     status,
+                    conta.getId(),
                     conta.getNome(),
                     conta.getTipo(),
                     conta.getSaldoInicial(),
-                    conta.getMoeda(),
-                    conta.getUsuario().getEmail()
+                    conta.getMoeda()
                 );
                 
                 if (!dadosValidos) {

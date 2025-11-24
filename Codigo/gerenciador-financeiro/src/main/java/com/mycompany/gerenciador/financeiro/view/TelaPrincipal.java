@@ -4,18 +4,22 @@
  */
 package com.mycompany.gerenciador.financeiro.view;
 
+import com.mycompany.gerenciador.financeiro.model.Usuario;
+
 /**
  *
  * @author Laís Isabella
  */
 public class TelaPrincipal extends javax.swing.JFrame {
 
+    private Usuario usuarioLogado;
+    
     /**
      * Creates new form TelaPrincipal
      */
-    public TelaPrincipal() {
+    public TelaPrincipal(Usuario usuarioLogado) {
+        this.usuarioLogado = usuarioLogado;
         initComponents();
-        
         configurarTela();
 
         // Ligações de eventos aos botões
@@ -33,21 +37,22 @@ public class TelaPrincipal extends javax.swing.JFrame {
      * Abre a tela de cadastro de contas
      */
     private void abrirTelaCadastro() {
-        new TelaCadastroConta().setVisible(true);
+        new TelaListarContas(usuarioLogado).setVisible(true);
     }
 
     /**
      * Abre a tela de listagem de contas
      */
     private void abrirTelaListar() {
-        new TelaListarContas().setVisible(true);
+        new TelaListarContas(usuarioLogado).setVisible(true);
     }
 
     /**
      * Fecha o sistema
      */
     private void sairDoSistema() {
-        System.exit(0);
+        new TelaLogin().setVisible(true);
+        this.dispose();
     }
 
     /**
@@ -149,7 +154,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }
 
         java.awt.EventQueue.invokeLater(() -> {
-            new TelaPrincipal().setVisible(true);
+            Usuario usuarioTeste = new Usuario("João Silva", "joao@email.com", "123456");
+            new TelaPrincipal(usuarioTeste).setVisible(true);
         });
     }
 
