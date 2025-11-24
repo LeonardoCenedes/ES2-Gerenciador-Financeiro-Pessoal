@@ -29,6 +29,18 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
 - PROJECTNAME-UUUU **MINOR** Corrigidos os testes do módulo *foo*.  
 - PROJECTNAME-RRRR **MAJOR** A linha do tempo do módulo *foo* agora utiliza o fuso horário do navegador para resolver datas.
 
+
+---
+## [1.4.0] - 23-10-2025
+
+### Adicionado
+ - FIN-90 **MAJOR** Adicionado `.asta` unificado
+ - FIN-32 **MAJOR** Adicionado diagramas faltantes no mesmo
+
+### Alterado  
+
+### Corrigido  
+
 ---
 ## [1.4.0] - 23-10-2025
 
