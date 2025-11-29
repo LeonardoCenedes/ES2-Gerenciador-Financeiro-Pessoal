@@ -37,7 +37,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
      * Abre a tela de cadastro de contas
      */
     private void abrirTelaCadastro() {
-        new TelaListarContas(usuarioLogado).setVisible(true);
+        new TelaCadastroConta(usuarioLogado).setVisible(true);
     }
 
     /**

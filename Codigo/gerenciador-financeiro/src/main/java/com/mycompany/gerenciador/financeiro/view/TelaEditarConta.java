@@ -17,6 +17,7 @@ public class TelaEditarConta extends javax.swing.JFrame {
 
     private ContaController controller;
     private Conta conta;
+    private String nomeOriginal;
 
     /**
      * Creates new form TelaEditarConta
@@ -24,6 +25,7 @@ public class TelaEditarConta extends javax.swing.JFrame {
     public TelaEditarConta(Conta conta) {
         initComponents();
         this.conta = conta;
+        this.nomeOriginal = conta.getNome();  // ✅ SALVAR o nome original
         try {
             this.controller = new ContaController();
         } catch (Exception e) {
@@ -185,23 +187,26 @@ public class TelaEditarConta extends javax.swing.JFrame {
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         try {
-            String nome = txtNome.getText();
-            String tipo = (String) cbTipo.getSelectedItem();
-            double saldoInicial = Double.parseDouble(txtSaldo.getText());
+        String nomeNovo = txtNome.getText();
+        String tipo = (String) cbTipo.getSelectedItem();
+        double saldoInicial = Double.parseDouble(txtSaldo.getText());
 
-            // ← MUDANÇA AQUI: passa a conta original em vez do ID
-            controller.editarConta(conta, nome, tipo, saldoInicial);
+        // ✅ Mantém o nome original na conta para localização
+        conta.setNome(nomeOriginal);  // Usa nome original para buscar
+        
+        // ✅ Chama o método de edição com o nome novo
+        controller.editarConta(conta, nomeNovo, tipo, saldoInicial);
 
-            JOptionPane.showMessageDialog(this, "Conta atualizada com sucesso!");
-            dispose();
+        JOptionPane.showMessageDialog(this, "Conta atualizada com sucesso!");
+        dispose();
 
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "O saldo inicial deve ser um número válido.");
-        } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Erro ao atualizar conta: " + e.getMessage());
-        }
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "O saldo inicial deve ser um número válido.");
+    } catch (IllegalArgumentException e) {
+        JOptionPane.showMessageDialog(this, e.getMessage());
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Erro ao atualizar conta: " + e.getMessage());
+    }
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed

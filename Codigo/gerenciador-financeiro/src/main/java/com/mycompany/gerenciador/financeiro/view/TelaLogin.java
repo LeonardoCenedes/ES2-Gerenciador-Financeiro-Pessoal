@@ -6,6 +6,7 @@ package com.mycompany.gerenciador.financeiro.view;
 
 import com.mycompany.gerenciador.financeiro.controller.UsuarioController;
 import com.mycompany.gerenciador.financeiro.model.Usuario;
+import java.io.IOException;
 import javax.swing.JOptionPane;
 
 /**
@@ -20,9 +21,19 @@ public class TelaLogin extends javax.swing.JFrame {
      * Creates new form TelaLogin
      */
     public TelaLogin() {
-        initComponents();
-        this.controller = new UsuarioController();
+         initComponents();
+        try {  // ← ADICIONAR TRY-CATCH
+            this.controller = new UsuarioController();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this,
+                "Erro ao inicializar controlador: " + e.getMessage(),
+                "Erro de Inicialização",
+                JOptionPane.ERROR_MESSAGE);
+        }
         configurarTela();
+        
+        btnEntrar.addActionListener(evt -> btnEntrarActionPerformed(evt));
+        
     }
     
     private void configurarTela() {
@@ -55,7 +66,11 @@ public class TelaLogin extends javax.swing.JFrame {
 
         jLabel2.setText("Email");
 
-        txtEmail.setText("Insira seu e-mail aqui");
+        txtEmail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtEmailActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("Senha");
 
@@ -141,6 +156,10 @@ public class TelaLogin extends javax.swing.JFrame {
     private void txtSenhaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSenhaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtSenhaActionPerformed
+
+    private void txtEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmailActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtEmailActionPerformed
 
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {
         String email = txtEmail.getText();

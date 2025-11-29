@@ -5,6 +5,7 @@
 package com.mycompany.gerenciador.financeiro.view;
 
 import com.mycompany.gerenciador.financeiro.controller.UsuarioController;
+import java.io.IOException;
 import javax.swing.JOptionPane;
 
 /**
@@ -19,9 +20,17 @@ public class TelaRegistro extends javax.swing.JFrame {
      * Creates new form TelaRegistro
      */
     public TelaRegistro() {
-        initComponents();
-        this.controller = new UsuarioController();
+         initComponents();
+        try {
+            this.controller = new UsuarioController();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this,
+                "Erro ao inicializar controlador: " + e.getMessage(),
+                "Erro de Inicialização",
+                JOptionPane.ERROR_MESSAGE);
+        }
         configurarTela();
+        btnRegistrar.addActionListener(evt -> btnRegistrarActionPerformed(evt));
     }
     private void configurarTela() {
         setTitle("Registrar - Gerenciador Financeiro");
@@ -60,14 +69,11 @@ public class TelaRegistro extends javax.swing.JFrame {
 
         jLabel2.setText("Nome");
 
-        txtNome.setText("Insira seu nome aqui");
         txtNome.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNomeActionPerformed(evt);
             }
         });
-
-        txtEmail.setText("exemplo@unesp.br");
 
         jLabel3.setText("Email");
 
@@ -147,14 +153,15 @@ public class TelaRegistro extends javax.swing.JFrame {
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {
         String nome = txtNome.getText();
-        String email = txtEmail.getText();
-        String senha = new String(txtSenha.getPassword());
+    String email = txtEmail.getText();
+    String senha = new String(txtSenha.getPassword());
 
-        if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Preencha todos os campos!");
-            return;
-        }
+    if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Preencha todos os campos!");
+        return;
+    }
 
+    try {
         boolean sucesso = controller.criarUsuario(nome, email, senha);
 
         if (sucesso) {
@@ -164,6 +171,12 @@ public class TelaRegistro extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "Email já cadastrado!");
         }
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(this, 
+            "Erro ao registrar usuário: " + e.getMessage(),
+            "Erro",
+            JOptionPane.ERROR_MESSAGE);
+    }
     }
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {

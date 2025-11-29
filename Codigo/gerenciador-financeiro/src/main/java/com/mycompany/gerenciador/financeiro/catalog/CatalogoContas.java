@@ -59,29 +59,29 @@ public class CatalogoContas {
      * Atualiza uma conta existente no catálogo e persiste no arquivo.
      * Implementa o caso de uso CE1.3 - Editar Conta Financeira.
      */
-    public void atualizar(Conta contaEditada) throws IOException {
-        // Localiza a conta pelo nome e email do usuário
-        int index = -1;
-        for (int i = 0; i < contas.size(); i++) {
-            Conta c = contas.get(i);
-            if (c.getNome().equals(contaEditada.getNome())
-                    && c.getUsuario().getEmail().equals(contaEditada.getUsuario().getEmail())) {
-                index = i;
-                break;
-            }
+    public void atualizar(Conta contaEditada, String nomeAnterior) throws IOException {
+    // Localiza a conta pelo NOME ANTERIOR e email do usuário
+    int index = -1;
+    for (int i = 0; i < contas.size(); i++) {
+        Conta c = contas.get(i);
+        if (c.getNome().equals(nomeAnterior)  // ✅ Usa o nome ANTERIOR
+                && c.getUsuario().getEmail().equals(contaEditada.getUsuario().getEmail())) {
+            index = i;
+            break;
         }
-
-        // Verifica se encontrou
-        if (index == -1) {
-            throw new IllegalArgumentException("Conta não encontrada para atualização.");
-        }
-
-        // Atualiza a conta na lista
-        contas.set(index, contaEditada);
-
-        // Sobrescreve o arquivo inteiro com todas as contas
-        repositorio.salvarTodas(contas);
     }
+
+    // Verifica se encontrou
+    if (index == -1) {
+        throw new IllegalArgumentException("Conta não encontrada para atualização.");
+    }
+
+    // Atualiza a conta na lista
+    contas.set(index, contaEditada);
+
+    // Sobrescreve o arquivo inteiro com todas as contas
+    repositorio.salvarTodas(contas);
+}
 
     /**
      * Remove uma conta existente do catálogo e do arquivo. Implementa o caso de

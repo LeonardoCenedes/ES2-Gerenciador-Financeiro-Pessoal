@@ -72,16 +72,21 @@ public class ContaController {
      * Financeira.
      */
     public void editarConta(Conta contaOriginal, String nome, String tipo, double saldoInicial)
-            throws IllegalArgumentException, IOException {
+        throws IllegalArgumentException, IOException {
 
-        validarConta(nome, tipo, saldoInicial, contaOriginal.getMoeda());
+    validarConta(nome, tipo, saldoInicial, contaOriginal.getMoeda());
 
-        contaOriginal.setNome(nome);
-        contaOriginal.setTipo(tipo);
-        contaOriginal.setSaldoInicial(saldoInicial);
+    // ✅ GUARDAR o nome original ANTES de mudar
+    String nomeAnterior = contaOriginal.getNome();
+    
+    // Atualiza os dados
+    contaOriginal.setNome(nome);
+    contaOriginal.setTipo(tipo);
+    contaOriginal.setSaldoInicial(saldoInicial);
 
-        catalogo.atualizar(contaOriginal);
-    }
+    // ✅ Passa o nome anterior para o catálogo localizar
+    catalogo.atualizar(contaOriginal, nomeAnterior);
+}
 
     /**
      * Exclui uma conta existente. Implementa o caso de uso CE1.4 - Excluir
