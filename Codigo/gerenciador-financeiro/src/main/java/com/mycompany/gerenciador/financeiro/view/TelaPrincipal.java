@@ -4,24 +4,30 @@
  */
 package com.mycompany.gerenciador.financeiro.view;
 
+import com.mycompany.gerenciador.financeiro.model.Usuario;
+
 /**
  *
  * @author Laís Isabella
  */
 public class TelaPrincipal extends javax.swing.JFrame {
 
+    private Usuario usuarioLogado;
+    
     /**
      * Creates new form TelaPrincipal
      */
-    public TelaPrincipal() {
+    public TelaPrincipal(Usuario usuarioLogado) {
+        this.usuarioLogado = usuarioLogado;
         initComponents();
-        
         configurarTela();
 
         // Ligações de eventos aos botões
         btnCadastrar.addActionListener(evt -> abrirTelaCadastro());
         btnListar.addActionListener(evt -> abrirTelaListar());
         btnSair.addActionListener(evt -> sairDoSistema());
+        btnCadastrarTransacao.addActionListener(evt -> abrirTelaCadastroTransacao());
+        btnVisualizarHistorico.addActionListener(evt -> abrirTelaVisualizarHistorico());
     }
     
      private void configurarTela() {
@@ -33,21 +39,30 @@ public class TelaPrincipal extends javax.swing.JFrame {
      * Abre a tela de cadastro de contas
      */
     private void abrirTelaCadastro() {
-        new TelaCadastroConta().setVisible(true);
+        new TelaCadastroConta(usuarioLogado).setVisible(true);
     }
+    
+    private void abrirTelaCadastroTransacao() {
+    new TelaCadastroTransacao(usuarioLogado).setVisible(true);
+}
 
     /**
      * Abre a tela de listagem de contas
      */
     private void abrirTelaListar() {
-        new TelaListarContas().setVisible(true);
+        new TelaListarContas(usuarioLogado).setVisible(true);
     }
+    
+    private void abrirTelaVisualizarHistorico() {
+    new TelaVisualizarHistoricoTransacoes(usuarioLogado).setVisible(true);
+}
 
     /**
      * Fecha o sistema
      */
     private void sairDoSistema() {
-        System.exit(0);
+        new TelaLogin().setVisible(true);
+        this.dispose();
     }
 
     /**
@@ -65,6 +80,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
+        btnCadastrarTransacao = new javax.swing.JButton();
+        btnVisualizarHistorico = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -85,6 +102,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
         jLabel2.setText("Controle suas contas e nunca mais se perca em suas finanças!");
 
+        btnCadastrarTransacao.setText("Cadastrar Transação");
+
+        btnVisualizarHistorico.setText("Vizualizar histórico de Transações");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -94,18 +115,20 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(93, 93, 93)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(btnListar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnCadastrar, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(jLabel2)
                                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 358, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(169, 169, 169)
-                        .addComponent(btnSair, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnSair, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(83, 83, 83)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnListar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnCadastrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnCadastrarTransacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnVisualizarHistorico))))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -115,15 +138,19 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
-                .addGap(12, 12, 12)
+                .addGap(18, 18, 18)
                 .addComponent(btnCadastrar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnListar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnCadastrarTransacao, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnVisualizarHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSair)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addGap(17, 17, 17))
         );
 
         pack();
@@ -149,14 +176,17 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }
 
         java.awt.EventQueue.invokeLater(() -> {
-            new TelaPrincipal().setVisible(true);
+            Usuario usuarioTeste = new Usuario("João Silva", "joao@email.com", "123456");
+            new TelaPrincipal(usuarioTeste).setVisible(true);
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCadastrar;
+    private javax.swing.JButton btnCadastrarTransacao;
     private javax.swing.JButton btnListar;
     private javax.swing.JButton btnSair;
+    private javax.swing.JButton btnVisualizarHistorico;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JSeparator jSeparator1;

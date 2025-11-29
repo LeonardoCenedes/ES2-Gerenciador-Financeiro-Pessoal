@@ -1,9 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
 package com.mycompany.gerenciador.financeiro;
 
-import com.mycompany.gerenciador.financeiro.view.TelaPrincipal;
+import com.mycompany.gerenciador.financeiro.view.TelaLogin;
 
 /**
  * Classe principal do sistema Gerenciador Financeiro Pessoal.
@@ -14,7 +11,7 @@ public class GerenciadorFinanceiro {
     
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
-            new TelaPrincipal().setVisible(true);
+            new TelaLogin().setVisible(true);
         });
     }
 }

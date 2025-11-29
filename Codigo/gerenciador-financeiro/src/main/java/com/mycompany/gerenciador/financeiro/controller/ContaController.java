@@ -2,6 +2,7 @@ package com.mycompany.gerenciador.financeiro.controller;
 
 import com.mycompany.gerenciador.financeiro.catalog.CatalogoContas;
 import com.mycompany.gerenciador.financeiro.model.Conta;
+import com.mycompany.gerenciador.financeiro.model.Usuario;
 import java.io.IOException;
 import java.util.List;
 
@@ -16,13 +17,13 @@ public class ContaController {
     /**
      * Cadastra uma nova conta financeira. Implementa o caso de uso CE1.1.
      */
-    public void cadastrarConta(String nome, String tipo, double saldoInicial, String moeda)
+    public void criarConta(String nome, String tipo, double saldoInicial, String moeda, Usuario usuario)
             throws IllegalArgumentException, IOException {
 
-        validarDados(nome, tipo, saldoInicial, moeda);
+        validarConta(nome, tipo, saldoInicial, moeda);
 
-        Conta novaConta = new Conta(nome, tipo, saldoInicial, moeda);
-        catalogo.adicionarConta(novaConta);
+        Conta novaConta = new Conta(nome, tipo, saldoInicial, moeda, usuario);
+        catalogo.salvar(novaConta);
     }
 
     /**
@@ -41,11 +42,12 @@ public class ContaController {
      * Busca uma conta específica pelo ID (opcional, pode ser usado em edições
      * futuras).
      */
-    public Conta buscarContaPorId(int id) {
-        return catalogo.buscarPorId(id);
+    public List<Conta> buscarContasUsuario(Usuario usuario) throws IOException {
+        catalogo.recarregar();
+        return catalogo.buscarPorUsuario(usuario);
     }
 
-    private void validarDados(String nome, String tipo, double saldoInicial, String moeda)
+    private void validarConta(String nome, String tipo, double saldoInicial, String moeda)
             throws IllegalArgumentException {
 
         if (nome == null || nome.trim().isEmpty()) {
@@ -69,34 +71,28 @@ public class ContaController {
      * Edita uma conta existente. Implementa o caso de uso CE1.3 - Editar Conta
      * Financeira.
      */
-    public void editarConta(int id, String nome, String tipo, double saldoInicial)
-            throws IllegalArgumentException, IOException {
+    public void editarConta(Conta contaOriginal, String nome, String tipo, double saldoInicial)
+        throws IllegalArgumentException, IOException {
 
-        // Busca a conta pelo ID
-        Conta conta = catalogo.buscarPorId(id);
+    validarConta(nome, tipo, saldoInicial, contaOriginal.getMoeda());
 
-        if (conta == null) {
-            throw new IllegalArgumentException("Conta não encontrada.");
-        }
+    // ✅ GUARDAR o nome original ANTES de mudar
+    String nomeAnterior = contaOriginal.getNome();
+    
+    // Atualiza os dados
+    contaOriginal.setNome(nome);
+    contaOriginal.setTipo(tipo);
+    contaOriginal.setSaldoInicial(saldoInicial);
 
-        // Valida os novos dados
-        validarDados(nome, tipo, saldoInicial, conta.getMoeda());
-
-        // Atualiza os campos (mantém ID e moeda)
-        conta.setNome(nome);
-        conta.setTipo(tipo);
-        conta.setSaldoInicial(saldoInicial);
-        // A moeda NÃO é alterada
-
-        // Salva a atualização
-        catalogo.atualizarConta(conta);
-    }
+    // ✅ Passa o nome anterior para o catálogo localizar
+    catalogo.atualizar(contaOriginal, nomeAnterior);
+}
 
     /**
      * Exclui uma conta existente. Implementa o caso de uso CE1.4 - Excluir
      * Conta Financeira.
      */
-    public void excluirConta(int id) throws IllegalArgumentException, IOException {
-        catalogo.excluirConta(id);
+    public void excluirConta(Conta conta) throws IOException {
+        catalogo.excluir(conta);
     }
 }

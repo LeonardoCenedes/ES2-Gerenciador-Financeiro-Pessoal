@@ -6,6 +6,7 @@ package com.mycompany.gerenciador.financeiro.view;
 
 import com.mycompany.gerenciador.financeiro.controller.ContaController;
 import com.mycompany.gerenciador.financeiro.model.Conta;
+import com.mycompany.gerenciador.financeiro.model.Usuario;
 import javax.swing.JOptionPane;
 
 /**
@@ -16,22 +17,24 @@ public class TelaEditarConta extends javax.swing.JFrame {
 
     private ContaController controller;
     private Conta conta;
-    
+    private String nomeOriginal;
+
     /**
      * Creates new form TelaEditarConta
      */
     public TelaEditarConta(Conta conta) {
         initComponents();
         this.conta = conta;
+        this.nomeOriginal = conta.getNome();  // ✅ SALVAR o nome original
         try {
             this.controller = new ContaController();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Erro ao inicializar: " + e.getMessage());
         }
         configurarTela();
-        preencherCampos();        
+        preencherCampos();
     }
-    
+
     private void configurarTela() {
         setTitle("Editar Conta Financeira");
         setLocationRelativeTo(null);
@@ -184,22 +187,26 @@ public class TelaEditarConta extends javax.swing.JFrame {
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         try {
-            String nome = txtNome.getText();
-            String tipo = (String) cbTipo.getSelectedItem();
-            double saldoInicial = Double.parseDouble(txtSaldo.getText());
+        String nomeNovo = txtNome.getText();
+        String tipo = (String) cbTipo.getSelectedItem();
+        double saldoInicial = Double.parseDouble(txtSaldo.getText());
 
-            controller.editarConta(conta.getId(), nome, tipo, saldoInicial);
+        // ✅ Mantém o nome original na conta para localização
+        conta.setNome(nomeOriginal);  // Usa nome original para buscar
+        
+        // ✅ Chama o método de edição com o nome novo
+        controller.editarConta(conta, nomeNovo, tipo, saldoInicial);
 
-            JOptionPane.showMessageDialog(this, "Conta atualizada com sucesso!");
-            dispose();
+        JOptionPane.showMessageDialog(this, "Conta atualizada com sucesso!");
+        dispose();
 
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "O saldo inicial deve ser um número válido.");
-        } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Erro ao atualizar conta: " + e.getMessage());
-        }
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "O saldo inicial deve ser um número válido.");
+    } catch (IllegalArgumentException e) {
+        JOptionPane.showMessageDialog(this, e.getMessage());
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Erro ao atualizar conta: " + e.getMessage());
+    }
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
@@ -239,12 +246,33 @@ public class TelaEditarConta extends javax.swing.JFrame {
                     break;
                 }
             }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(TelaEditarConta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(TelaEditarConta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(TelaEditarConta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(TelaEditarConta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
         } catch (Exception ex) {
             // Usa look and feel padrão
         }
 
+        Usuario usuarioTeste = new Usuario("João Silva", "joao@email.com", "123456");
+
+        // Cria uma conta de teste com o usuário (SEM ID)
+        Conta contaTeste = new Conta("Conta Corrente Itaú", "Conta Corrente", 1000.0, "BRL", usuarioTeste);
         /* Create and display the form */
-        Conta contaTeste = new Conta(1, "Teste", "Conta Corrente", 1000.0, "BRL");
+
         java.awt.EventQueue.invokeLater(() -> {
             new TelaEditarConta(contaTeste).setVisible(true);
         });

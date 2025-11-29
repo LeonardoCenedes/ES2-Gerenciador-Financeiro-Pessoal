@@ -1,8 +1,11 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.mycompany.gerenciador.financeiro.test.Conta;
 
 import com.mycompany.gerenciador.financeiro.controller.ContaController;
 import com.mycompany.gerenciador.financeiro.model.Conta;
-import com.mycompany.gerenciador.financeiro.model.Usuario;
 import java.util.List;
 
 /**
@@ -10,13 +13,8 @@ import java.util.List;
  */
 public class TesteIntegracaoEdicao {
     
-    private static Usuario usuarioTeste;
-    
     public static void main(String[] args) {
         System.out.println("=== INICIANDO TESTE DE INTEGRAÇÃO - EDIÇÃO ===\n");
-        
-        // Cria usuário de teste para todos os testes
-        usuarioTeste = new Usuario("Maria Silva", "maria@email.com", "123456");
         
         // Teste 1: Preparar dados - cadastrar conta para editar
         prepararDadosTeste();
@@ -33,8 +31,8 @@ public class TesteIntegracaoEdicao {
         // Teste 5: Validações na edição
         testarValidacoesEdicao();
         
-        // Teste 6: Tentar editar conta com dados inválidos
-        testarEditarContaInvalida();
+        // Teste 6: Tentar editar conta inexistente
+        testarEditarContaInexistente();
         
         System.out.println("\n=== TESTES FINALIZADOS ===");
     }
@@ -45,7 +43,7 @@ public class TesteIntegracaoEdicao {
             ContaController controller = new ContaController();
             
             // Cadastra conta inicial para ser editada
-            controller.criarConta("Conta Original", "Conta Corrente", 1000.0, "BRL", usuarioTeste);
+            controller.criarConta("Conta Original", "Conta Corrente", 1000.0, "BRL");
             System.out.println("OK -- Conta cadastrada para teste");
             
         } catch (Exception e) {
@@ -59,19 +57,20 @@ public class TesteIntegracaoEdicao {
         try {
             ContaController controller = new ContaController();
             
-            // Busca as contas do usuário
-            List<Conta> contas = controller.buscarContasUsuario(usuarioTeste);
+            // Busca a conta para editar
+            List<Conta> contas = controller.listarContas();
             if (contas.isEmpty()) {
                 System.out.println("X -- ERRO: Nenhuma conta encontrada para editar");
                 return;
             }
             
             Conta conta = contas.get(contas.size() - 1); // Pega a última conta
+            int idConta = conta.getId();
             
-            // Edita a conta (passa a conta original)
-            controller.editarConta(conta, "Conta Editada", "Poupança", 2500.0);
+            // Edita a conta
+            controller.editarConta(idConta, "Conta Editada", "Poupança", 2500.0);
             System.out.println("OK -- Conta editada com sucesso");
-            System.out.println("    Nome original: Conta Original");
+            System.out.println("    ID: " + idConta);
             System.out.println("    Novo nome: Conta Editada");
             System.out.println("    Novo tipo: Poupança");
             System.out.println("    Novo saldo: R$ 2500.00");
@@ -86,7 +85,7 @@ public class TesteIntegracaoEdicao {
         System.out.println("TESTE 3: Verificar se Edição foi Persistida");
         try {
             ContaController controller = new ContaController();
-            List<Conta> contas = controller.buscarContasUsuario(usuarioTeste);
+            List<Conta> contas = controller.listarContas();
             
             if (contas.isEmpty()) {
                 System.out.println("X -- ERRO: Nenhuma conta encontrada");
@@ -97,7 +96,8 @@ public class TesteIntegracaoEdicao {
             
             System.out.println("---------------------------------------------------");
             System.out.println("Dados da conta após edição:");
-            System.out.printf("Nome: %s | Tipo: %s | Saldo: R$ %.2f | Moeda: %s\n",
+            System.out.printf("ID: %d | Nome: %s | Tipo: %s | Saldo: R$ %.2f | Moeda: %s\n",
+                conta.getId(),
                 conta.getNome(),
                 conta.getTipo(),
                 conta.getSaldoInicial(),
@@ -128,7 +128,7 @@ public class TesteIntegracaoEdicao {
         System.out.println("TESTE 4: Verificar que Moeda NÃO foi Alterada");
         try {
             ContaController controller = new ContaController();
-            List<Conta> contas = controller.buscarContasUsuario(usuarioTeste);
+            List<Conta> contas = controller.listarContas();
             
             if (contas.isEmpty()) {
                 System.out.println("X -- ERRO: Nenhuma conta encontrada");
@@ -155,18 +155,18 @@ public class TesteIntegracaoEdicao {
         
         try {
             ContaController controller = new ContaController();
-            List<Conta> contas = controller.buscarContasUsuario(usuarioTeste);
+            List<Conta> contas = controller.listarContas();
             
             if (contas.isEmpty()) {
                 System.out.println("X -- ERRO: Nenhuma conta encontrada para testar validações");
                 return;
             }
             
-            Conta conta = contas.get(0);
+            int idConta = contas.get(0).getId();
             
             // Teste 5.1: Nome vazio
             try {
-                controller.editarConta(conta, "", "Poupança", 1000.0);
+                controller.editarConta(idConta, "", "Poupança", 1000.0);
                 System.out.println("X -- ERRO: Deveria ter rejeitado nome vazio");
             } catch (IllegalArgumentException e) {
                 System.out.println("OK -- Nome vazio rejeitado: " + e.getMessage());
@@ -174,7 +174,7 @@ public class TesteIntegracaoEdicao {
             
             // Teste 5.2: Saldo negativo
             try {
-                controller.editarConta(conta, "Conta Teste", "Poupança", -500.0);
+                controller.editarConta(idConta, "Conta Teste", "Poupança", -500.0);
                 System.out.println("X -- ERRO: Deveria ter rejeitado saldo negativo");
             } catch (IllegalArgumentException e) {
                 System.out.println("OK -- Saldo negativo rejeitado: " + e.getMessage());
@@ -182,7 +182,7 @@ public class TesteIntegracaoEdicao {
             
             // Teste 5.3: Tipo vazio
             try {
-                controller.editarConta(conta, "Conta Teste", "", 1000.0);
+                controller.editarConta(idConta, "Conta Teste", "", 1000.0);
                 System.out.println("X -- ERRO: Deveria ter rejeitado tipo vazio");
             } catch (IllegalArgumentException e) {
                 System.out.println("OK -- Tipo vazio rejeitado: " + e.getMessage());
@@ -195,17 +195,14 @@ public class TesteIntegracaoEdicao {
         System.out.println();
     }
     
-    private static void testarEditarContaInvalida() {
-        System.out.println("TESTE 6: Tentar Editar Conta com Dados Inválidos");
+    private static void testarEditarContaInexistente() {
+        System.out.println("TESTE 6: Tentar Editar Conta Inexistente");
         try {
             ContaController controller = new ContaController();
             
-            // Cria uma conta que não existe no sistema
-            Conta contaInexistente = new Conta("Conta Fantasma", "Poupança", 1000.0, "BRL", usuarioTeste);
-            
-            // Tenta editar
-            controller.editarConta(contaInexistente, "Nome Novo", "Poupança", 1000.0);
-            System.out.println("X -- ERRO: Deveria ter lançado exceção para conta inexistente");
+            // Tenta editar uma conta com ID inexistente (9999)
+            controller.editarConta(9999, "Conta Fantasma", "Poupança", 1000.0);
+            System.out.println("X -- ERRO: Deveria ter lançado exceção para ID inexistente");
             
         } catch (IllegalArgumentException e) {
             System.out.println("OK -- Conta inexistente rejeitada: " + e.getMessage());

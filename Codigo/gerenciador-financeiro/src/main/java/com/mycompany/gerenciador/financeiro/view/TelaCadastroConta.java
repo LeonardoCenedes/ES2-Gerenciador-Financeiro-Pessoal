@@ -4,6 +4,7 @@
  */
 package com.mycompany.gerenciador.financeiro.view;
 import com.mycompany.gerenciador.financeiro.controller.ContaController;
+import com.mycompany.gerenciador.financeiro.model.Usuario;
 import javax.swing.JOptionPane;
 
 /**
@@ -13,13 +14,15 @@ import javax.swing.JOptionPane;
 public class TelaCadastroConta extends javax.swing.JFrame  {
 
     private ContaController controller;
+    private Usuario usuarioLogado;
 
     /**
      * Creates new form TelaCadastroConta
      */
-    public TelaCadastroConta() {
-        initComponents();
-         try {
+    public TelaCadastroConta(Usuario usuarioLogado) {
+    this.usuarioLogado = usuarioLogado;  // Agora recebe o usuário como parâmetro
+    initComponents();
+    try {
         this.controller = new ContaController();
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this,
@@ -28,8 +31,8 @@ public class TelaCadastroConta extends javax.swing.JFrame  {
             JOptionPane.ERROR_MESSAGE);
         this.controller = null;
     }
-        configurarTela();
-    }
+    configurarTela();
+}
 
     /**
      * Configurações adicionais da tela
@@ -177,7 +180,7 @@ public class TelaCadastroConta extends javax.swing.JFrame  {
         String moeda = (String) cbMoeda.getSelectedItem();
 
         // Chamar o controller para cadastrar
-        controller.cadastrarConta(nome, tipo, saldoInicial, moeda);
+         controller.criarConta(nome, tipo, saldoInicial, moeda, usuarioLogado);
 
         // Mostrar mensagem de sucesso
         JOptionPane.showMessageDialog(this, "Conta cadastrada com sucesso!");
@@ -231,11 +234,26 @@ public class TelaCadastroConta extends javax.swing.JFrame  {
     }
         //</editor-fold>
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new TelaCadastroConta().setVisible(true);
+          try {
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
             }
-        });
+        }
+    } catch (Exception ex) {
+        // Se falhar, usa o look and feel padrão
+    }
+    //</editor-fold>
+    
+    /* Create and display the form */
+    java.awt.EventQueue.invokeLater(new Runnable() {
+        public void run() {
+            // ✅ Cria um usuário de teste e passa para o construtor
+            Usuario usuarioTeste = new Usuario("João Silva", "joao@email.com", "123456");
+            new TelaCadastroConta(usuarioTeste).setVisible(true);
+        }
+    });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

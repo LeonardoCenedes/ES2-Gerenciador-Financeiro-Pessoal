@@ -45,6 +45,11 @@ Aqui estariam os passos de atualização para a versão 1.2.4 que os usuários d
 ## [1.4.0] - 23-10-2025
 
 ### Adicionado
+ - FIN-94 **MAJOR** Adicionado ajustes pedidos nos casos de uso referentes à conta e adição das funcionalidades de adição, listagen, edição e exclusão de uma transação.
+---
+## [1.4.0] - 23-10-2025
+
+### Adicionado
  - FIN-32 **MAJOR** Adicionado `.asta` com os diagramas de sequência e diagrama de classes do caso de uso 1
  - FIN-32 **MAJOR** Adicionado PDF com todos os diagramas de sequência
 

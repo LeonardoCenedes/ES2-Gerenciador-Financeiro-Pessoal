@@ -5,6 +5,7 @@
 package com.mycompany.gerenciador.financeiro.repository;
 
 import com.mycompany.gerenciador.financeiro.model.Conta;
+import com.mycompany.gerenciador.financeiro.model.Usuario;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,9 +33,6 @@ public class ContaRepositoryTxt {
     }
 
     public void salvar(Conta conta) throws IOException {
-        int proximoId = gerarProximoId();
-        conta.setId(proximoId);
-
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO, true))) {
             String linha = formatarContaParaLinha(conta);
             writer.write(linha);
@@ -68,11 +66,11 @@ public class ContaRepositoryTxt {
     }
 
     private String formatarContaParaLinha(Conta conta) {
-        return conta.getId() + SEPARADOR
-                + conta.getNome() + SEPARADOR
+        return conta.getNome() + SEPARADOR
                 + conta.getTipo() + SEPARADOR
                 + conta.getSaldoInicial() + SEPARADOR
-                + conta.getMoeda();
+                + conta.getMoeda() + SEPARADOR
+                + conta.getUsuario().getEmail();
     }
 
     /**
@@ -86,7 +84,6 @@ public class ContaRepositoryTxt {
         List<Conta> contas = new ArrayList<>();
         File arquivo = new File(ARQUIVO);
 
-        // Se o arquivo não existe, retorna lista vazia
         if (!arquivo.exists()) {
             return contas;
         }
@@ -111,13 +108,17 @@ public class ContaRepositoryTxt {
     private Conta parsearLinha(String linha) {
         String[] partes = linha.split(SEPARADOR);
 
-        int id = Integer.parseInt(partes[0]);
-        String nome = partes[1];
-        String tipo = partes[2];
-        double saldoInicial = Double.parseDouble(partes[3]);
-        String moeda = partes[4];
+        String nome = partes[0];
+        String tipo = partes[1];
+        double saldoInicial = Double.parseDouble(partes[2]);
+        String moeda = partes[3];
+        String emailUsuario = partes[4];
 
-        return new Conta(id, nome, tipo, saldoInicial, moeda);
+        // Cria um objeto Usuario básico apenas com o email
+        Usuario usuario = new Usuario();
+        usuario.setEmail(emailUsuario);
+
+        return new Conta(nome, tipo, saldoInicial, moeda, usuario);
     }
 
     /**

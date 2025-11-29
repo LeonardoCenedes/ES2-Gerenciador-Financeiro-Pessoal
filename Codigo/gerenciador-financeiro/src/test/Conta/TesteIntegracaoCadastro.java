@@ -2,7 +2,6 @@ package com.mycompany.gerenciador.financeiro.test.Conta;
 
 import com.mycompany.gerenciador.financeiro.controller.ContaController;
 import com.mycompany.gerenciador.financeiro.model.Conta;
-import com.mycompany.gerenciador.financeiro.model.Usuario;
 import com.mycompany.gerenciador.financeiro.repository.ContaRepositoryTxt;
 import java.util.List;
 
@@ -31,19 +30,16 @@ public class TesteIntegracaoCadastro {
         try {
             ContaController controller = new ContaController();
             
-            // Cria um usuário de teste
-            Usuario usuario = new Usuario("João Silva", "joao@email.com", "123456");
-            
             // Cadastrar primeira conta
-            controller.criarConta("Conta Corrente Itaú", "Conta Corrente", 5000.0, "BRL", usuario);
-            System.out.println("✓ Conta 1 cadastrada com sucesso");
+            controller.criarConta("Conta Corrente Itaú", "Conta Corrente", 5000.0, "BRL");
+            System.out.println(" Conta 1 cadastrada com sucesso");
             
             // Cadastrar segunda conta
-            controller.criarConta("Poupança Caixa", "Poupança", 1500.0, "BRL", usuario);
+            controller.criarConta("Poupança Caixa", "Poupança", 1500.0, "BRL");
             System.out.println("OK -- Conta 2 cadastrada com sucesso");
             
             // Cadastrar terceira conta
-            controller.criarConta("Cartão Nubank", "Cartão de Crédito", 0.0, "BRL", usuario);
+            controller.criarConta("Cartão Nubank", "Cartão de Crédito", 0.0, "BRL");
             System.out.println("OK -- Conta 3 cadastrada com sucesso");
             
         } catch (Exception e) {
@@ -63,12 +59,12 @@ public class TesteIntegracaoCadastro {
             System.out.println("---------------------------------------------------");
             
             for (Conta conta : contas) {
-                System.out.printf("Nome: %s | Tipo: %s | Saldo: R$ %.2f | Moeda: %s | Usuário: %s\n",
+                System.out.printf("ID: %d | Nome: %s | Tipo: %s | Saldo: R$ %.2f | Moeda: %s\n",
+                    conta.getId(),
                     conta.getNome(),
                     conta.getTipo(),
                     conta.getSaldoInicial(),
-                    conta.getMoeda(),
-                    conta.getUsuario().getEmail()
+                    conta.getMoeda()
                 );
             }
             System.out.println("---------------------------------------------------");
@@ -84,13 +80,10 @@ public class TesteIntegracaoCadastro {
 
         try {
             ContaController controller = new ContaController();
-            
-            // Cria um usuário de teste
-            Usuario usuario = new Usuario("João Silva", "joao@email.com", "123456");
 
             // Teste 3.1: Nome vazio
             try {
-                controller.criarConta("", "Conta Corrente", 1000.0, "BRL", usuario);
+                controller.criarConta("", "Conta Corrente", 1000.0, "BRL");
                 System.out.println("X -- ERRO: Deveria ter rejeitado nome vazio");
             } catch (IllegalArgumentException e) {
                 System.out.println("OK -- Nome vazio rejeitado corretamente: " + e.getMessage());
@@ -98,7 +91,7 @@ public class TesteIntegracaoCadastro {
 
             // Teste 3.2: Saldo negativo
             try {
-                controller.criarConta("Conta Teste", "Poupança", -500.0, "BRL", usuario);
+                controller.criarConta("Conta Teste", "Poupança", -500.0, "BRL");
                 System.out.println("X -- ERRO: Deveria ter rejeitado saldo negativo");
             } catch (IllegalArgumentException e) {
                 System.out.println("OK -- Saldo negativo rejeitado corretamente: " + e.getMessage());
@@ -106,7 +99,7 @@ public class TesteIntegracaoCadastro {
 
             // Teste 3.3: Tipo vazio
             try {
-                controller.criarConta("Conta Teste", "", 1000.0, "BRL", usuario);
+                controller.criarConta("Conta Teste", "", 1000.0, "BRL");
                 System.out.println("X -- ERRO: Deveria ter rejeitado tipo vazio");
             } catch (IllegalArgumentException e) {
                 System.out.println("OK -- Tipo vazio rejeitado corretamente: " + e.getMessage());

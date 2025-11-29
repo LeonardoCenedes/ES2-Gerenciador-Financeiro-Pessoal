@@ -9,46 +9,21 @@ package com.mycompany.gerenciador.financeiro.model;
  * @author Laís Isabella
  */
 public class Conta {
-    private int id;
-    private String nome;
+     private String nome;
     private String tipo;
     private double saldoInicial;
     private String moeda;
+    private Usuario usuario;
 
-    /**
-     * Construtor vazio
-     */
     public Conta() {
     }
 
-    /**
-     * Construtor completo (sem id, pois será gerado pelo repositório)
-     */
-    public Conta(String nome, String tipo, double saldoInicial, String moeda) {
+    public Conta(String nome, String tipo, double saldoInicial, String moeda, Usuario usuario) {
         this.nome = nome;
         this.tipo = tipo;
         this.saldoInicial = saldoInicial;
         this.moeda = moeda;
-    }
-
-    /**
-     * Construtor completo com id (usado ao carregar do arquivo)
-     */
-    public Conta(int id, String nome, String tipo, double saldoInicial, String moeda) {
-        this.id = id;
-        this.nome = nome;
-        this.tipo = tipo;
-        this.saldoInicial = saldoInicial;
-        this.moeda = moeda;
-    }
-
-    // Getters e Setters
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        this.usuario = usuario;
     }
 
     public String getNome() {
@@ -79,19 +54,26 @@ public class Conta {
         return moeda;
     }
 
-    // Setter de moeda é privado conforme RF001.4 (moeda não pode ser alterada)
     private void setMoeda(String moeda) {
         this.moeda = moeda;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     @Override
     public String toString() {
         return "Conta{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
+                "nome='" + nome + '\'' +
                 ", tipo='" + tipo + '\'' +
                 ", saldoInicial=" + saldoInicial +
                 ", moeda='" + moeda + '\'' +
+                ", usuario=" + (usuario != null ? usuario.getEmail() : "null") +
                 '}';
     }
 }
