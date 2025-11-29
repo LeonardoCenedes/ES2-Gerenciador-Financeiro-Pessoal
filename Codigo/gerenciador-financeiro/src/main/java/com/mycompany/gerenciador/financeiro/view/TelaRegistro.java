@@ -84,7 +84,6 @@ public class TelaRegistro extends javax.swing.JFrame {
         btnVoltar.setFont(new java.awt.Font("Segoe UI", 0, 8)); // NOI18N
         btnVoltar.setText("Voltar");
 
-        txtSenha.setText("jPasswordField1");
         txtSenha.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtSenhaActionPerformed(evt);

@@ -1,0 +1,3 @@
+Alimentação;true;true
+Saúde;true;true
+Lazer;true;true
