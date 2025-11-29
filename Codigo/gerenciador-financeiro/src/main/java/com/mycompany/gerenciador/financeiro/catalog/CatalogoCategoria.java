@@ -21,6 +21,8 @@ public class CatalogoCategoria {
         }
     }
 
+    //criei esse metodo só pra nao ter que gastar mt tempo criado o fluxo pra fazer isso pela interface, dps removam plsss
+    //ele é tipo uma seed
     private void criarCategoriasPadrao() throws IOException {
         String[] nomesPadrao = {"Alimentação", "Saúde", "Lazer"};
         
@@ -31,7 +33,7 @@ public class CatalogoCategoria {
         }
     }
 
-    public List<Categoria> listar() {
+    public List<Categoria> listarTodas() {
         return new ArrayList<>(categorias);
     }
 

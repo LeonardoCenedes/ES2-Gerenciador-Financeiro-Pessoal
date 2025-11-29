@@ -71,29 +71,21 @@ public class TransacaoController {
 
         return true;
     }
+    
+   //falta add os parametros conta: Conta no diagrama de classes nesse metodo a seguir
+    public List<Transacao> buscarTransacoesFiltradas(Usuario usuario, Conta conta,
+            Date data, Categoria categoria,
+            TiposTransacao tipo)
+            throws IOException {
 
-    /**
-     * Implementa mensagem 1 do diagrama de visualizar histórico: 1:
-     * buscarTransacoesFiltradas(conta:Conta, data:Date, categoria:Categoria,
-     * tipo:TiposTransacao) : List<Transacao>
-     *
-     * FLUXO: 1. Usuário chama buscarTransacoesFiltradas 1.1. Sistema chama
-     * listarTransacoesFiltrada no CatalogoTransacao Retorna: "Transações do
-     * usuário filtradas buscadas"
-     */
-    public List<Transacao> buscarTransacoesFiltradas(Usuario usuario, Conta conta, 
-                                                 Date data, Categoria categoria, 
-                                                 TiposTransacao tipo) 
-        throws IOException {
-    
-    // Recarrega as transações do arquivo
-    catalogo.recarregar();
-    
-    // ✅ Agora passa usuario como primeiro parâmetro
-    List<Transacao> resultado = catalogo.listarTransacoesFiltrada(usuario, conta, data, categoria, tipo);
-    
-    return resultado;
-}
+        // Recarrega as transações do arquivo
+        catalogo.recarregar();
+
+        // ✅ Agora passa usuario como primeiro parâmetro
+        List<Transacao> resultado = catalogo.listarTransacoesFiltrada(usuario, conta, data, categoria, tipo);
+
+        return resultado;
+    }
 
     public boolean excluirTransacao(Transacao transacao) throws IOException {
         try {
@@ -135,7 +127,7 @@ public class TransacaoController {
         }
 
         // 1.1: atualizarTransacao - conforme diagrama de colaboração
-        boolean resultado = catalogo.atualizarTransacao(atualizada, data, valor,
+        boolean resultado = catalogo.atualizar(atualizada, data, valor,
                 categoria, descricao,
                 comprovante, tipo);
 

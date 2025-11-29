@@ -35,11 +35,6 @@ public class CatalogoTransacao {
         this.transacoes = new ArrayList<>(repositorio.listar());
     }
 
-    /**
-     * Implementa 1.1: listarTransacoesFiltrada(conta:Conta, data:Date,
-     * categoria:Categoria, tipo:TiposTransacao) : List<Transacao>
-     * Conforme diagrama de colaboração
-     */
     public List<Transacao> listarTransacoesFiltrada(Usuario usuario, Conta conta,
             Date data, Categoria categoria,
             TiposTransacao tipo) {
@@ -48,7 +43,6 @@ public class CatalogoTransacao {
         for (Transacao t : transacoes) {
             boolean match = true;
 
-            // ✅ Filtro por usuário (SEMPRE aplicado)
             if (usuario != null && t.getUsuario() != null) {
                 if (!t.getUsuario().getEmail().equals(usuario.getEmail())) {
                     match = false;
@@ -91,7 +85,7 @@ public class CatalogoTransacao {
         return resultado;
     }
 
-    public boolean atualizarTransacao(Transacao atual, Date data, float valor,
+    public boolean atualizar(Transacao atual, Date data, float valor,
             Categoria categoria, String descricao,
             String comprovante, TiposTransacao tipo)
             throws IOException {

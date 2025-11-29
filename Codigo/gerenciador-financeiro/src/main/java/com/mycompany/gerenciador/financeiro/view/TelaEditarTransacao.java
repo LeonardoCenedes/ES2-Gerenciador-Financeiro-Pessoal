@@ -4,7 +4,7 @@
  */
 package com.mycompany.gerenciador.financeiro.view;
 
-import com.mycompany.gerenciador.financeiro.controller.ControladorCategoria;
+import com.mycompany.gerenciador.financeiro.controller.CategoriaController;
 import com.mycompany.gerenciador.financeiro.controller.TransacaoController;
 import com.mycompany.gerenciador.financeiro.model.Categoria;
 import com.mycompany.gerenciador.financeiro.model.TiposTransacao;
@@ -23,7 +23,7 @@ public class TelaEditarTransacao extends javax.swing.JFrame {
 
     private TransacaoController controller;
     private Transacao transacao;
-    private ControladorCategoria categoriaController;
+    private CategoriaController categoriaController;
     private List<Categoria> categoriasDisponiveis;
 
     public TelaEditarTransacao(Transacao transacao) {
@@ -31,7 +31,7 @@ public class TelaEditarTransacao extends javax.swing.JFrame {
     this.transacao = transacao;
     try {
         this.controller = new TransacaoController();
-        this.categoriaController = new ControladorCategoria();
+        this.categoriaController = new CategoriaController();
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Erro ao inicializar: " + e.getMessage());
     }

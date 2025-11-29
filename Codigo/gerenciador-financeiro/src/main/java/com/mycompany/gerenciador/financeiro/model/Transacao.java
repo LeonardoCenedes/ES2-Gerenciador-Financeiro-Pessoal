@@ -15,10 +15,11 @@ public class Transacao {
     private float valor;
     private Categoria categoria;
     private String descricao;
-    private String comprovante;
+    private String comprovante; //nao consegui implementar isso, mas acredito que seja so alterar pq o fluxo ja esta correto
     private TiposTransacao tipo;
     private Conta Conta;
     private Usuario usuario;
+    //ainda não temos meta economica
 
     public Transacao() {
     }

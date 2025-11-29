@@ -5,7 +5,7 @@
 package com.mycompany.gerenciador.financeiro.view;
 
 import com.mycompany.gerenciador.financeiro.controller.ContaController;
-import com.mycompany.gerenciador.financeiro.controller.ControladorCategoria;
+import com.mycompany.gerenciador.financeiro.controller.CategoriaController;
 import com.mycompany.gerenciador.financeiro.controller.TransacaoController;
 import com.mycompany.gerenciador.financeiro.model.Categoria;
 import com.mycompany.gerenciador.financeiro.model.Conta;
@@ -30,7 +30,7 @@ public class TelaVisualizarHistoricoTransacoes extends javax.swing.JFrame {
     private DefaultTableModel modeloTabela;
     private Usuario usuarioLogado;
     private List<Conta> contasUsuario;
-    private ControladorCategoria categoriaController;
+    private CategoriaController categoriaController;
     private List<Categoria> categoriasDisponiveis;
 
     /**
@@ -42,7 +42,7 @@ public class TelaVisualizarHistoricoTransacoes extends javax.swing.JFrame {
         try {
             this.controller = new TransacaoController();
             this.contaController = new ContaController();
-            this.categoriaController = new ControladorCategoria();
+            this.categoriaController = new CategoriaController();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
                     "Erro ao inicializar: " + e.getMessage(),

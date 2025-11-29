@@ -9,7 +9,8 @@ package com.mycompany.gerenciador.financeiro.model;
  * @author Laís Isabella
  */
 public class Categoria {
-        private String nome;
+
+    private String nome;
     private boolean padrao;
     private boolean status;
 
@@ -48,10 +49,10 @@ public class Categoria {
 
     @Override
     public String toString() {
-        return "Categoria{" +
-                "nome='" + nome + '\'' +
-                ", padrao=" + padrao +
-                ", status=" + status +
-                '}';
+        return "Categoria{"
+                + "nome='" + nome + '\''
+                + ", padrao=" + padrao
+                + ", status=" + status
+                + '}';
     }
 }
