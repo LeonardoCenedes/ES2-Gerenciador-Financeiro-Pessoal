@@ -1,6 +1,5 @@
 package com.mycompany.gerenciador.financeiro.repository;
 
-import com.mycompany.gerenciador.financeiro.model.Usuario;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,12 +9,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mycompany.gerenciador.financeiro.model.Usuario;
+
 /**
  * Repositório para persistência de usuários em arquivo texto
+ * Padrão In-Memory Cache: carrega tudo na inicialização, salva tudo ao encerrar
  * 
  * @author Laís Isabella
  */
-public class UsuarioRepositoryTxt {
+public class UsuarioRepositoryTxt implements Repository<Usuario> {
     
     private static final String DIRETORIO = "data";
     private static final String ARQUIVO = "data/usuarios.txt";
@@ -33,26 +35,10 @@ public class UsuarioRepositoryTxt {
     }
 
     /**
-     * Salva um novo usuário no arquivo (SEM ID)
+     * Carrega todos os usuários do arquivo para memória
      */
-    public void salvar(Usuario usuario) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO, true))) {
-            String linha = formatarUsuarioParaLinha(usuario);
-            writer.write(linha);
-            writer.newLine();
-        }
-    }
-
-    private String formatarUsuarioParaLinha(Usuario usuario) {
-        return usuario.getNome() + SEPARADOR
-                + usuario.getEmail() + SEPARADOR
-                + usuario.getSenha();
-    }
-
-    /**
-     * Lista todos os usuários do arquivo
-     */
-    public List<Usuario> listar() throws IOException {
+    @Override
+    public List<Usuario> carregarTodos() throws IOException {
         List<Usuario> usuarios = new ArrayList<>();
         File arquivo = new File(ARQUIVO);
 
@@ -71,6 +57,27 @@ public class UsuarioRepositoryTxt {
         }
 
         return usuarios;
+    }
+
+    /**
+     * Salva todos os usuários da memória para o arquivo
+     * Sobrescreve o arquivo completamente
+     */
+    @Override
+    public void salvarTodos(List<Usuario> usuarios) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO, false))) {
+            for (Usuario usuario : usuarios) {
+                String linha = formatarUsuarioParaLinha(usuario);
+                writer.write(linha);
+                writer.newLine();
+            }
+        }
+    }
+
+    private String formatarUsuarioParaLinha(Usuario usuario) {
+        return usuario.getNome() + SEPARADOR
+                + usuario.getEmail() + SEPARADOR
+                + usuario.getSenha();
     }
 
     /**

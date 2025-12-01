@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug JavaFX App",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 8000,
+            "projectName": "gerenciador-financeiro"
+        }
+    ]
+}

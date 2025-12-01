@@ -1,30 +1,46 @@
 package com.mycompany.gerenciador.financeiro.catalog;
 
-import com.mycompany.gerenciador.financeiro.model.Usuario;
-import com.mycompany.gerenciador.financeiro.repository.UsuarioRepositoryTxt;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mycompany.gerenciador.financeiro.model.Usuario;
+import com.mycompany.gerenciador.financeiro.repository.UsuarioRepositoryTxt;
+
 /**
  * Catálogo de usuários do sistema
+ * Padrão In-Memory Cache: mantém dados em memória, repository apenas para I/O
  * 
  * @author Laís Isabella
  */
 public class CatalogoUsuario {
     
-    private List<Usuario> usuarios;
-    private UsuarioRepositoryTxt repositorio;
+    private final List<Usuario> usuarios;
+    private final UsuarioRepositoryTxt repositorio;
 
+    /**
+     * Construtor padrão - cria Repository e carrega dados
+     * Cadeia de construção OO: Catalog cria Repository
+     */
     public CatalogoUsuario() throws IOException {
         this.repositorio = new UsuarioRepositoryTxt();
-        this.usuarios = new ArrayList<>(repositorio.listar());
+        this.usuarios = new ArrayList<>(repositorio.carregarTodos());
+    }
+
+    /**
+     * Construtor com injeção para testes - permite mockar o repository
+     * Para testes unitários com mocks
+     */
+    public CatalogoUsuario(UsuarioRepositoryTxt repositorio, List<Usuario> usuariosIniciais) {
+        this.repositorio = repositorio;
+        this.usuarios = new ArrayList<>(usuariosIniciais);
     }
 
     /**
      * Implementa 1.1: criar(usuario:Usuario) : boolean do diagrama
+     * Opera APENAS em memória, não salva no arquivo
      */
-    public boolean criar(Usuario usuario) throws IOException {
+    public boolean criar(Usuario usuario) {
         // Verifica se email já existe
         for (Usuario u : usuarios) {
             if (u.getEmail().equalsIgnoreCase(usuario.getEmail())) {
@@ -33,19 +49,18 @@ public class CatalogoUsuario {
         }
         
         usuarios.add(usuario);
-        repositorio.salvar(usuario);  // ← SALVA NO ARQUIVO
         return true;
     }
 
     /**
-     * Lista todos os usuários
+     * Lista todos os usuários da memória
      */
     public List<Usuario> listarUsuarios() {
         return new ArrayList<>(usuarios);
     }
 
     /**
-     * Busca um usuário pelo email
+     * Busca um usuário pelo email na memória
      */
     public Usuario buscarPorEmail(String email) {
         for (Usuario u : usuarios) {
@@ -70,9 +85,10 @@ public class CatalogoUsuario {
     }
 
     /**
-     * Atualiza lista local lendo novamente o arquivo
+     * Persiste todos os usuários da memória para o arquivo
+     * Deve ser chamado ao encerrar a aplicação (quando View fechar)
      */
-    public void recarregar() throws IOException {
-        this.usuarios = new ArrayList<>(repositorio.listar());
+    public void salvarAoEncerrar() throws IOException {
+        repositorio.salvarTodos(usuarios);
     }
 }

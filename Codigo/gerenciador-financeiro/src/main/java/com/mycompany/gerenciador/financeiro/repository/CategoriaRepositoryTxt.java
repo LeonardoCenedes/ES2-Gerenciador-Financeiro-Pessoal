@@ -4,7 +4,6 @@
  */
 package com.mycompany.gerenciador.financeiro.repository;
 
-import com.mycompany.gerenciador.financeiro.model.Categoria;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,11 +13,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mycompany.gerenciador.financeiro.model.Categoria;
+
 /**
- *
+ * Repositório para persistência de categorias em arquivo texto
+ * Padrão In-Memory Cache: carrega tudo na inicialização, salva tudo ao encerrar
+ * 
  * @author Laís Isabella
  */
-public class CategoriaRepositoryTxt {
+public class CategoriaRepositoryTxt implements Repository<Categoria> {
 
     private static final String DIRETORIO = "data";
     private static final String ARQUIVO = "data/categorias.txt";
@@ -35,17 +38,6 @@ public class CategoriaRepositoryTxt {
         }
     }
 
-    /**
-     * Salva uma nova categoria no arquivo
-     */
-    public void salvar(Categoria categoria) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO, true))) {
-            String linha = formatarCategoriaParaLinha(categoria);
-            writer.write(linha);
-            writer.newLine();
-        }
-    }
-
     private String formatarCategoriaParaLinha(Categoria categoria) {
         return categoria.getNome() + SEPARADOR
                 + categoria.isPadrao() + SEPARADOR
@@ -53,9 +45,10 @@ public class CategoriaRepositoryTxt {
     }
 
     /**
-     * Lista todas as categorias do arquivo
+     * Carrega todas as categorias do arquivo para memória
      */
-    public List<Categoria> listar() throws IOException {
+    @Override
+    public List<Categoria> carregarTodos() throws IOException {
         List<Categoria> categorias = new ArrayList<>();
         File arquivo = new File(ARQUIVO);
 
@@ -91,9 +84,11 @@ public class CategoriaRepositoryTxt {
     }
 
     /**
-     * Sobrescreve o arquivo com todas as categorias
+     * Salva todas as categorias da memória para o arquivo
+     * Sobrescreve o arquivo completamente
      */
-    public void salvarTodas(List<Categoria> categorias) throws IOException {
+    @Override
+    public void salvarTodos(List<Categoria> categorias) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO, false))) {
             for (Categoria categoria : categorias) {
                 String linha = formatarCategoriaParaLinha(categoria);

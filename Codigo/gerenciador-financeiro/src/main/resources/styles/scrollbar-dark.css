@@ -1,0 +1,92 @@
+/* Estilização do ScrollPane */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .corner {
+    -fx-background-color: transparent;
+}
+
+/* Scrollbar vertical */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-padding: 0 5 0 0;
+    -fx-background-insets: 0;
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: #2a2a2a;
+    -fx-background-radius: 5;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #7b2cbf;
+    -fx-background-radius: 5;
+    -fx-background-insets: 2;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #9d4edd;
+}
+
+.scroll-bar:vertical .thumb:pressed {
+    -fx-background-color: #c77dff;
+}
+
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-padding: 0;
+}
+
+.scroll-bar:vertical .increment-arrow,
+.scroll-bar:vertical .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+
+/* Scrollbar horizontal */
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 5 0;
+}
+
+.scroll-bar:horizontal .track {
+    -fx-background-color: #2a2a2a;
+    -fx-background-radius: 5;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #7b2cbf;
+    -fx-background-radius: 5;
+    -fx-background-insets: 2;
+}
+
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #9d4edd;
+}
+
+.scroll-bar:horizontal .thumb:pressed {
+    -fx-background-color: #c77dff;
+}
+
+.scroll-bar:horizontal .increment-button,
+.scroll-bar:horizontal .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-padding: 0;
+}
+
+.scroll-bar:horizontal .increment-arrow,
+.scroll-bar:horizontal .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}

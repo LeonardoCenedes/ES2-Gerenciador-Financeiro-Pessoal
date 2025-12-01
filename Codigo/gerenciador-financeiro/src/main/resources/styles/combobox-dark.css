@@ -1,0 +1,80 @@
+/* Estilo escuro para ComboBox */
+.combo-box {
+    -fx-background-color: #1a1a1a;
+    -fx-background-radius: 10;
+    -fx-border-color: #3a3a3a;
+    -fx-border-radius: 10;
+    -fx-border-width: 1.5;
+}
+
+.combo-box:focused {
+    -fx-background-color: #1a1a1a;
+    -fx-border-color: #3a3a3a;
+    -fx-border-width: 1.5;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #1a1a1a;
+    -fx-text-fill: #e0e0e0;
+    -fx-padding: 8;
+}
+
+/* Campo de texto editável dentro do ComboBox */
+.combo-box .text-input {
+    -fx-background-color: #1a1a1a;
+    -fx-text-fill: #e0e0e0;
+    -fx-prompt-text-fill: #666666;
+}
+
+.combo-box:editable .text-field {
+    -fx-background-color: #1a1a1a;
+    -fx-text-fill: #e0e0e0;
+    -fx-prompt-text-fill: #666666;
+}
+
+.combo-box:editable:focused .text-field {
+    -fx-background-color: #1a1a1a;
+    -fx-text-fill: #e0e0e0;
+}
+
+/* Popup do dropdown */
+.combo-box-popup .list-view {
+    -fx-background-color: #1a1a1a;
+    -fx-background-insets: 0;
+    -fx-padding: 5;
+    -fx-border-color: #3a3a3a;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: #1a1a1a;
+    -fx-text-fill: #e0e0e0;
+    -fx-padding: 8;
+    -fx-background-radius: 5;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #2a2a2a;
+    -fx-text-fill: #e0e0e0;
+}
+
+.combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: #333333;
+    -fx-text-fill: #e0e0e0;
+}
+
+.combo-box-popup .list-view .list-cell:filled:selected:focused,
+.combo-box-popup .list-view .list-cell:filled:selected {
+    -fx-background-color: #333333;
+    -fx-text-fill: #e0e0e0;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #cccccc;
+}

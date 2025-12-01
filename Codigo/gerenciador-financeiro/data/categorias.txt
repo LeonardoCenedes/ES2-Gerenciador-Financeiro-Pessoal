@@ -1,3 +1,4 @@
-Alimentação;true;true
-Saúde;true;true
+AlimentaÃ§Ã£o;true;true
+SaÃºde;true;true
 Lazer;true;true
+Teste;false;true

@@ -1,1 +1,2 @@
 testeee;Conta Corrente;342.0;BRL;lais.isabella@unesp.br
+Teste;Corrente;100.0;BRL;leonardo.cenedes@unesp.br

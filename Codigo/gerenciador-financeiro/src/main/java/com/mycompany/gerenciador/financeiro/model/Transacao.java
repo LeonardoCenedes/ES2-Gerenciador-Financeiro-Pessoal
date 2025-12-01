@@ -15,17 +15,16 @@ public class Transacao {
     private float valor;
     private Categoria categoria;
     private String descricao;
-    private String comprovante; //nao consegui implementar isso, mas acredito que seja so alterar pq o fluxo ja esta correto
+    private byte[] comprovante; // Documento em bytes (PDF)
     private TiposTransacao tipo;
     private Conta Conta;
-    private Usuario usuario;
-    //ainda não temos meta economica
+    private MetaEconomica metaEconomica;
 
     public Transacao() {
     }
 
     public Transacao(Date data, float valor, Categoria categoria, String descricao,
-                     String comprovante, TiposTransacao tipo, Conta Conta, Usuario usuario) {
+                     byte[] comprovante, TiposTransacao tipo, Conta Conta, MetaEconomica metaEconomica) {
         this.data = data;
         this.valor = valor;
         this.categoria = categoria;
@@ -33,7 +32,7 @@ public class Transacao {
         this.comprovante = comprovante;
         this.tipo = tipo;
         this.Conta = Conta;
-        this.usuario = usuario;
+        this.metaEconomica = metaEconomica;
     }
 
     public Date getData() {
@@ -68,11 +67,11 @@ public class Transacao {
         this.descricao = descricao;
     }
 
-    public String getComprovante() {
+    public byte[] getComprovante() {
         return comprovante;
     }
 
-    public void setComprovante(String comprovante) {
+    public void setComprovante(byte[] comprovante) {
         this.comprovante = comprovante;
     }
 
@@ -92,12 +91,12 @@ public class Transacao {
         this.Conta = Conta;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public MetaEconomica getMetaEconomica() {
+        return metaEconomica;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setMetaEconomica(MetaEconomica metaEconomica) {
+        this.metaEconomica = metaEconomica;
     }
 
     @Override
@@ -109,7 +108,7 @@ public class Transacao {
                 ", descricao='" + descricao + '\'' +
                 ", tipo=" + tipo +
                 ", Conta=" + (Conta != null ? Conta.getNome() : "null") +
-                ", usuario=" + (usuario != null ? usuario.getEmail() : "null") +
+                ", metaEconomica=" + (metaEconomica != null ? metaEconomica.getNome() : "null") +
                 '}';
     } 
 }

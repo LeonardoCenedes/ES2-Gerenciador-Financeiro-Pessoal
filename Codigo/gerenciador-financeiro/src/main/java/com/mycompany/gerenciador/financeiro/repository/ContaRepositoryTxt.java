@@ -4,8 +4,6 @@
  */
 package com.mycompany.gerenciador.financeiro.repository;
 
-import com.mycompany.gerenciador.financeiro.model.Conta;
-import com.mycompany.gerenciador.financeiro.model.Usuario;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,7 +13,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContaRepositoryTxt {
+import com.mycompany.gerenciador.financeiro.model.Conta;
+import com.mycompany.gerenciador.financeiro.model.Usuario;
+
+/**
+ * Repositório para persistência de contas em arquivo texto
+ * Padrão In-Memory Cache: carrega tudo na inicialização, salva tudo ao encerrar
+ */
+public class ContaRepositoryTxt implements Repository<Conta> {
 
     private static final String DIRETORIO = "data";
     private static final String ARQUIVO = "data/contas.txt";
@@ -32,39 +37,6 @@ public class ContaRepositoryTxt {
         }
     }
 
-    public void salvar(Conta conta) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO, true))) {
-            String linha = formatarContaParaLinha(conta);
-            writer.write(linha);
-            writer.newLine();
-        }
-    }
-
-    private int gerarProximoId() throws IOException {
-        File arquivo = new File(ARQUIVO);
-
-        if (!arquivo.exists()) {
-            return 1;
-        }
-
-        int maiorId = 0;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(ARQUIVO))) {
-            String linha;
-            while ((linha = reader.readLine()) != null) {
-                if (!linha.trim().isEmpty()) {
-                    String[] partes = linha.split(SEPARADOR);
-                    int id = Integer.parseInt(partes[0]);
-                    if (id > maiorId) {
-                        maiorId = id;
-                    }
-                }
-            }
-        }
-
-        return maiorId + 1;
-    }
-
     private String formatarContaParaLinha(Conta conta) {
         return conta.getNome() + SEPARADOR
                 + conta.getTipo() + SEPARADOR
@@ -74,13 +46,10 @@ public class ContaRepositoryTxt {
     }
 
     /**
-     * Lista todas as contas do arquivo. Implementação do RF001.2 - Visualizar
-     * Conta Financeira.
-     *
-     * @return Lista de contas cadastradas (vazia se arquivo não existir)
-     * @throws IOException se houver erro na leitura do arquivo
+     * Carrega todas as contas do arquivo para memória
      */
-    public List<Conta> listar() throws IOException {
+    @Override
+    public List<Conta> carregarTodos() throws IOException {
         List<Conta> contas = new ArrayList<>();
         File arquivo = new File(ARQUIVO);
 
@@ -110,7 +79,7 @@ public class ContaRepositoryTxt {
 
         String nome = partes[0];
         String tipo = partes[1];
-        double saldoInicial = Double.parseDouble(partes[2]);
+        float saldoInicial = Float.parseFloat(partes[2]);
         String moeda = partes[3];
         String emailUsuario = partes[4];
 
@@ -122,13 +91,11 @@ public class ContaRepositoryTxt {
     }
 
     /**
-     * Sobrescreve completamente o arquivo com a lista de contas fornecida.
-     * Usado para atualizar contas existentes.
-     *
-     * @param contas Lista completa de contas a ser salva
-     * @throws IOException se houver erro ao escrever no arquivo
+     * Salva todas as contas da memória para o arquivo
+     * Sobrescreve o arquivo completamente
      */
-    public void salvarTodas(List<Conta> contas) throws IOException {
+    @Override
+    public void salvarTodos(List<Conta> contas) throws IOException {
         // Sobrescreve o arquivo (false = não append)
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO, false))) {
             for (Conta conta : contas) {

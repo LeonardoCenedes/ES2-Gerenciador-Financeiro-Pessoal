@@ -11,14 +11,14 @@ package com.mycompany.gerenciador.financeiro.model;
 public class Conta {
      private String nome;
     private String tipo;
-    private double saldoInicial;
+    private float saldoInicial;
     private String moeda;
     private Usuario usuario;
 
     public Conta() {
     }
 
-    public Conta(String nome, String tipo, double saldoInicial, String moeda, Usuario usuario) {
+    public Conta(String nome, String tipo, float saldoInicial, String moeda, Usuario usuario) {
         this.nome = nome;
         this.tipo = tipo;
         this.saldoInicial = saldoInicial;
@@ -42,20 +42,16 @@ public class Conta {
         this.tipo = tipo;
     }
 
-    public double getSaldoInicial() {
+    public float getSaldoInicial() {
         return saldoInicial;
     }
 
-    public void setSaldoInicial(double saldoInicial) {
+    public void setSaldoInicial(float saldoInicial) {
         this.saldoInicial = saldoInicial;
     }
 
     public String getMoeda() {
         return moeda;
-    }
-
-    private void setMoeda(String moeda) {
-        this.moeda = moeda;
     }
 
     public Usuario getUsuario() {
