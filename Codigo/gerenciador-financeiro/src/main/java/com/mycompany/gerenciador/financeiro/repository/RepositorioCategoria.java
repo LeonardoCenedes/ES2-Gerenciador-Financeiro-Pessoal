@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mycompany.gerenciador.financeiro.model.Categoria;
+import com.mycompany.gerenciador.financeiro.util.DataPathResolver;
 
 /**
  * Repositório para persistência de categorias em arquivo texto
@@ -21,13 +22,13 @@ import com.mycompany.gerenciador.financeiro.model.Categoria;
  * 
  * @author Laís Isabella
  */
-public class CategoriaRepositoryTxt implements Repository<Categoria> {
+public class RepositorioCategoria implements Repositorio<Categoria> {
 
-    private static final String DIRETORIO = "data";
-    private static final String ARQUIVO = "data/categorias.txt";
+    private static final String DIRETORIO = DataPathResolver.getDataPath();
+    private static final String ARQUIVO = DataPathResolver.getFilePath("categorias.txt");
     private static final String SEPARADOR = ";";
 
-    public CategoriaRepositoryTxt() {
+    public RepositorioCategoria() {
         criarDiretorioSeNaoExistir();
     }
 

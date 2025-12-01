@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import com.mycompany.gerenciador.financeiro.model.Conta;
 import com.mycompany.gerenciador.financeiro.model.LancamentoRecorrente;
-import com.mycompany.gerenciador.financeiro.repository.LancamentoRecorrenteRepositoryTxt;
+import com.mycompany.gerenciador.financeiro.repository.RepositorioLancamentoRecorrente;
 
 /**
  * Catálogo de lançamentos recorrentes - Padrão In-Memory Cache
@@ -21,14 +21,14 @@ import com.mycompany.gerenciador.financeiro.repository.LancamentoRecorrenteRepos
 public class CatalogoLancamentoRecorrente {
     
     private final List<LancamentoRecorrente> lancamentos;
-    private final LancamentoRecorrenteRepositoryTxt repository;
+    private final RepositorioLancamentoRecorrente repository;
 
     /**
      * Construtor padrão - cria Repository e carrega dados
      * Cadeia de construção OO: Catalog cria Repository
      */
     public CatalogoLancamentoRecorrente() throws IOException {
-        this.repository = new LancamentoRecorrenteRepositoryTxt();
+        this.repository = new RepositorioLancamentoRecorrente();
         this.lancamentos = repository.carregarTodos();
     }
 

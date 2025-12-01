@@ -10,7 +10,7 @@ import java.util.List;
 
 import com.mycompany.gerenciador.financeiro.model.MetaEconomica;
 import com.mycompany.gerenciador.financeiro.model.Usuario;
-import com.mycompany.gerenciador.financeiro.repository.MetaEconomicaRepositoryTxt;
+import com.mycompany.gerenciador.financeiro.repository.RepositorioMetaEconomica;
 
 /**
  * Catálogo de metas econômicas - Padrão In-Memory Cache
@@ -20,14 +20,14 @@ import com.mycompany.gerenciador.financeiro.repository.MetaEconomicaRepositoryTx
 public class CatalogoMetaEconomica {
     
     private final List<MetaEconomica> metas;
-    private final MetaEconomicaRepositoryTxt repositorio;
+    private final RepositorioMetaEconomica repositorio;
 
     /**
      * Construtor padrão - cria Repository e carrega dados
      * Cadeia de construção OO: Catalog cria Repository
      */
     public CatalogoMetaEconomica() throws IOException {
-        this.repositorio = new MetaEconomicaRepositoryTxt();
+        this.repositorio = new RepositorioMetaEconomica();
         this.metas = new ArrayList<>(repositorio.carregarTodos());
     }
 

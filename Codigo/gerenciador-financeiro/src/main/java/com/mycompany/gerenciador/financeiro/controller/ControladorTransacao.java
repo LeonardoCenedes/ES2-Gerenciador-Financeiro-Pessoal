@@ -130,21 +130,32 @@ public class ControladorTransacao {
         }
     }
 
-    public Map<Categoria, Float> requererRelatorioDespesas(Conta conta,
+    /**
+     * Gera relatório de despesas por categoria para uma conta
+     * Retorna Map com nome da categoria como chave e soma dos valores como valor
+     */
+    public Map<String, Float> requererRelatorioDespesas(Conta conta,
             Categoria categoria,
             TiposTransacao tipo)
             throws IOException {
+        // 1.1: listarTransacoesFiltrada - busca transações filtradas
         List<Transacao> transacoes = buscarTransacoesFiltradas(conta, null, categoria, tipo);
+        // 1.2: agruparDespesasPorCategoria - agrupa e retorna dados agregados
         return agruparDespesasPorCategoria(transacoes);
     }
 
-    public Map<Categoria, Float> agruparDespesasPorCategoria(List<Transacao> transacoes) {
-        Map<Categoria, Float> agrupamento = new HashMap<>();
+    /**
+     * Agrupa despesas por categoria - soma valores de transações agrupadas por nome da categoria
+     * Retorna Map<String, Float> onde a chave é o nome da categoria e o valor é a soma
+     */
+    public Map<String, Float> agruparDespesasPorCategoria(List<Transacao> transacoes) {
+        Map<String, Float> agrupamento = new HashMap<>();
 
         for (Transacao t : transacoes) {
             Categoria cat = t.getCategoria();
-            float valorAtual = agrupamento.getOrDefault(cat, 0.0f);
-            agrupamento.put(cat, valorAtual + t.getValor());
+            String nomeCategoria = cat != null ? cat.getNome() : "Sem categoria";
+            float valorAtual = agrupamento.getOrDefault(nomeCategoria, 0.0f);
+            agrupamento.put(nomeCategoria, valorAtual + t.getValor());
         }
 
         return agrupamento;

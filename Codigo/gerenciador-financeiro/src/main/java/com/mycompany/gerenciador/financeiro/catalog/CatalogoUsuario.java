@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mycompany.gerenciador.financeiro.model.Usuario;
-import com.mycompany.gerenciador.financeiro.repository.UsuarioRepositoryTxt;
+import com.mycompany.gerenciador.financeiro.repository.RepositorioUsuario;
 
 /**
  * Catálogo de usuários do sistema
@@ -16,14 +16,14 @@ import com.mycompany.gerenciador.financeiro.repository.UsuarioRepositoryTxt;
 public class CatalogoUsuario {
     
     private final List<Usuario> usuarios;
-    private final UsuarioRepositoryTxt repositorio;
+    private final RepositorioUsuario repositorio;
 
     /**
      * Construtor padrão - cria Repository e carrega dados
      * Cadeia de construção OO: Catalog cria Repository
      */
     public CatalogoUsuario() throws IOException {
-        this.repositorio = new UsuarioRepositoryTxt();
+        this.repositorio = new RepositorioUsuario();
         this.usuarios = new ArrayList<>(repositorio.carregarTodos());
     }
 
@@ -31,7 +31,7 @@ public class CatalogoUsuario {
      * Construtor com injeção para testes - permite mockar o repository
      * Para testes unitários com mocks
      */
-    public CatalogoUsuario(UsuarioRepositoryTxt repositorio, List<Usuario> usuariosIniciais) {
+    public CatalogoUsuario(RepositorioUsuario repositorio, List<Usuario> usuariosIniciais) {
         this.repositorio = repositorio;
         this.usuarios = new ArrayList<>(usuariosIniciais);
     }

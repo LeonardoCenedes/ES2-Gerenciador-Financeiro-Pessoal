@@ -10,7 +10,7 @@ import java.util.List;
 
 import com.mycompany.gerenciador.financeiro.model.Orcamento;
 import com.mycompany.gerenciador.financeiro.model.Usuario;
-import com.mycompany.gerenciador.financeiro.repository.OrcamentoRepositoryTxt;
+import com.mycompany.gerenciador.financeiro.repository.RepositorioOrcamento;
 
 /**
  * Catálogo de orçamentos - Padrão In-Memory Cache
@@ -20,14 +20,14 @@ import com.mycompany.gerenciador.financeiro.repository.OrcamentoRepositoryTxt;
 public class CatalogoOrcamento {
     
     private final List<Orcamento> orcamentos;
-    private final OrcamentoRepositoryTxt repositorio;
+    private final RepositorioOrcamento repositorio;
 
     /**
      * Construtor padrão - cria Repository e carrega dados
      * Cadeia de construção OO: Catalog cria Repository
      */
     public CatalogoOrcamento() throws IOException {
-        this.repositorio = new OrcamentoRepositoryTxt();
+        this.repositorio = new RepositorioOrcamento();
         this.orcamentos = new ArrayList<>(repositorio.carregarTodos());
     }
 

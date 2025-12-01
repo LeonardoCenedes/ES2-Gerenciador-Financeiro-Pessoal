@@ -7,6 +7,7 @@
 01/12/2025;10.0;Investimento;Teste de App;;ENTRADA;Investimentos;Teste
 01/12/2025;10.0;Saúde;Farmácia;;SAIDA;Cartão de Crédito;
 01/12/2025;10.0;Saúde;Consulta;;ENTRADA;Conta USD;
+01/12/2025;10.0;Lazer;Cinema;;ENTRADA;Poupança;
 01/12/2025;2500.0;Saúde;Salário Dezembro;;ENTRADA;Teste;
 15/11/2025;3000.0;Saúde;Salário Novembro;;ENTRADA;Poupança;
 20/11/2025;450.0;Alimentação;Supermercado Semanal;;SAIDA;Poupança;

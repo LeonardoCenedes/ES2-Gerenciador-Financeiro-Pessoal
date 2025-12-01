@@ -21,6 +21,7 @@ import com.mycompany.gerenciador.financeiro.model.Conta;
 import com.mycompany.gerenciador.financeiro.model.MetaEconomica;
 import com.mycompany.gerenciador.financeiro.model.TiposTransacao;
 import com.mycompany.gerenciador.financeiro.model.Transacao;
+import com.mycompany.gerenciador.financeiro.util.DataPathResolver;
 
 /**
  * Repositório para persistência de transações em arquivo texto
@@ -28,13 +29,13 @@ import com.mycompany.gerenciador.financeiro.model.Transacao;
  * 
  * @author Laís Isabella
  */
-public class TransacaoRepositoryTxt implements Repository<Transacao> {
-    private static final String DIRETORIO = "data";
-    private static final String ARQUIVO = "data/transacoes.txt";
+public class RepositorioTransacao implements Repositorio<Transacao> {
+    private static final String DIRETORIO = DataPathResolver.getDataPath();
+    private static final String ARQUIVO = DataPathResolver.getFilePath("transacoes.txt");
     private static final String SEPARADOR = ";";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
-    public TransacaoRepositoryTxt() {
+    public RepositorioTransacao() {
         criarDiretorioSeNaoExistir();
     }
 

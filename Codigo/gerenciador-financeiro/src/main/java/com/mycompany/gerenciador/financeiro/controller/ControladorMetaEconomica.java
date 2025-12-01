@@ -78,11 +78,20 @@ public class ControladorMetaEconomica {
             return false;
         }
 
+        // Busca a meta no catálogo para garantir que estamos atualizando a referência correta
+        MetaEconomica metaNoCatalogo = catalogo.buscarPorNome(meta.getNome(), meta.getUsuario());
+        if (metaNoCatalogo == null) {
+            return false;
+        }
+
         // Adiciona o valor da transação ao valorEconomizadoAtual
-        float novoValor = meta.getValorEconomizadoAtual() + valorContribuicao;
+        float novoValor = metaNoCatalogo.getValorEconomizadoAtual() + valorContribuicao;
+        metaNoCatalogo.setValorEconomizadoAtual(novoValor);
+
+        // Atualiza também a meta passada como parâmetro para manter sincronizado
         meta.setValorEconomizadoAtual(novoValor);
 
-        return catalogo.atualizar(meta);
+        return catalogo.atualizar(metaNoCatalogo);
     }
 
     /**

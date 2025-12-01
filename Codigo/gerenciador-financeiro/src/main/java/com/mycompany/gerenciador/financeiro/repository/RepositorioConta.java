@@ -7,26 +7,30 @@ package com.mycompany.gerenciador.financeiro.repository;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.mycompany.gerenciador.financeiro.model.Conta;
 import com.mycompany.gerenciador.financeiro.model.Usuario;
+import com.mycompany.gerenciador.financeiro.util.DataPathResolver;
 
 /**
  * Repositório para persistência de contas em arquivo texto
  * Padrão In-Memory Cache: carrega tudo na inicialização, salva tudo ao encerrar
  */
-public class ContaRepositoryTxt implements Repository<Conta> {
+public class RepositorioConta implements Repositorio<Conta> {
 
     private static final String DIRETORIO = "data";
-    private static final String ARQUIVO = "data/contas.txt";
+    private static final String ARQUIVO = DataPathResolver.getFilePath("contas.txt");
     private static final String SEPARADOR = ";";
 
-    public ContaRepositoryTxt() {
+    public RepositorioConta() {
         criarDiretorioSeNaoExistir();
     }
 
@@ -57,7 +61,8 @@ public class ContaRepositoryTxt implements Repository<Conta> {
             return contas;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(ARQUIVO))) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(ARQUIVO), StandardCharsets.UTF_8))) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 if (!linha.trim().isEmpty()) {
@@ -97,7 +102,8 @@ public class ContaRepositoryTxt implements Repository<Conta> {
     @Override
     public void salvarTodos(List<Conta> contas) throws IOException {
         // Sobrescreve o arquivo (false = não append)
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO, false))) {
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream(ARQUIVO, false), StandardCharsets.UTF_8))) {
             for (Conta conta : contas) {
                 String linha = formatarContaParaLinha(conta);
                 writer.write(linha);

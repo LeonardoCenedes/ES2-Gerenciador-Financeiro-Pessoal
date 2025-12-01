@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Interface base para repositories com padrão in-memory cache
- * Repositories carregam tudo na inicialização e salvam tudo ao encerrar
+ * Interface base para repositórios com padrão in-memory cache
+ * Repositórios carregam tudo na inicialização e salvam tudo ao encerrar
  * 
  * @param <T> Tipo da entidade
  * @author Leonardo Cenedes
  */
-public interface Repository<T> {
+public interface Repositorio<T> {
     
     /**
      * Carrega todos os registros do arquivo para memória

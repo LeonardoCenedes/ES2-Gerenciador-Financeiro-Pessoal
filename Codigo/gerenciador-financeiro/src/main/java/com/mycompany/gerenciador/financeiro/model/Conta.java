@@ -72,4 +72,26 @@ public class Conta {
                 ", usuario=" + (usuario != null ? usuario.getEmail() : "null") +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        Conta conta = (Conta) obj;
+        
+        // Compara pelo nome e usuário (identificadores únicos)
+        if (nome == null || conta.nome == null) return false;
+        if (!nome.equals(conta.nome)) return false;
+        
+        if (usuario == null || conta.usuario == null) return false;
+        return usuario.equals(conta.usuario);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = nome != null ? nome.hashCode() : 0;
+        result = 31 * result + (usuario != null ? usuario.hashCode() : 0);
+        return result;
+    }
 }

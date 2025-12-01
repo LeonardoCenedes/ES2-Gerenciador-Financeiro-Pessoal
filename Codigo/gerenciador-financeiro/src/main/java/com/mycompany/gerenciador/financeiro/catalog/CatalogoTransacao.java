@@ -9,7 +9,7 @@ import com.mycompany.gerenciador.financeiro.model.Categoria;
 import com.mycompany.gerenciador.financeiro.model.Conta;
 import com.mycompany.gerenciador.financeiro.model.TiposTransacao;
 import com.mycompany.gerenciador.financeiro.model.Transacao;
-import com.mycompany.gerenciador.financeiro.repository.TransacaoRepositoryTxt;
+import com.mycompany.gerenciador.financeiro.repository.RepositorioTransacao;
 
 /**
  * Catálogo de transações
@@ -18,14 +18,14 @@ import com.mycompany.gerenciador.financeiro.repository.TransacaoRepositoryTxt;
 public class CatalogoTransacao {
 
     private final List<Transacao> transacoes;
-    private final TransacaoRepositoryTxt repositorio;
+    private final RepositorioTransacao repositorio;
 
     /**
      * Construtor padrão - cria Repository e carrega dados
      * Cadeia de construção OO: Catalog cria Repository
      */
     public CatalogoTransacao() throws IOException {
-        this.repositorio = new TransacaoRepositoryTxt();
+        this.repositorio = new RepositorioTransacao();
         this.transacoes = new ArrayList<>(repositorio.carregarTodos());
     }
 

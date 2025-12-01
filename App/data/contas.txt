@@ -1,5 +1,6 @@
 testeee;Conta Corrente;342.0;BRL;lais.isabella@unesp.br
 Teste;Corrente;100.0;BRL;leonardo.cenedes@unesp.br
+Poupança;Poupança;5000.0;BRL;leonardo.cenedes@unesp.br
 Investimentos;Investimento;12500.0;BRL;leonardo.cenedes@unesp.br
 Cartão de Crédito;Cartão;-850.0;BRL;leonardo.cenedes@unesp.br
 Conta USD;Corrente;2500.0;USD;leonardo.cenedes@unesp.br

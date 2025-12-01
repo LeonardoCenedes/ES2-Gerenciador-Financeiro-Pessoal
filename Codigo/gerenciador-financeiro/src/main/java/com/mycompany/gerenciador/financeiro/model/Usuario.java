@@ -53,4 +53,20 @@ public class Usuario {
                 ", email='" + email + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        Usuario usuario = (Usuario) obj;
+        
+        // Compara pelo email (identificador único)
+        return email != null && email.equals(usuario.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return email != null ? email.hashCode() : 0;
+    }
 }

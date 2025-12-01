@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mycompany.gerenciador.financeiro.model.Categoria;
-import com.mycompany.gerenciador.financeiro.repository.CategoriaRepositoryTxt;
+import com.mycompany.gerenciador.financeiro.repository.RepositorioCategoria;
 
 /**
  * Catálogo de categorias - Padrão In-Memory Cache
@@ -14,14 +14,14 @@ import com.mycompany.gerenciador.financeiro.repository.CategoriaRepositoryTxt;
 public class CatalogoCategoria {
     
     private final List<Categoria> categorias;
-    private final CategoriaRepositoryTxt repositorio;
+    private final RepositorioCategoria repositorio;
 
     /**
      * Construtor padrão - cria Repository e carrega dados
      * Cadeia de construção OO: Catalog cria Repository
      */
     public CatalogoCategoria() throws IOException {
-        this.repositorio = new CategoriaRepositoryTxt();
+        this.repositorio = new RepositorioCategoria();
         this.categorias = new ArrayList<>(repositorio.carregarTodos());
         
         // Cria categorias padrão se não existirem
@@ -34,7 +34,7 @@ public class CatalogoCategoria {
      * Construtor com injeção para testes - permite mockar o repository
      * Para testes unitários com mocks
      */
-    public CatalogoCategoria(CategoriaRepositoryTxt repositorio, List<Categoria> categoriasIniciais) {
+    public CatalogoCategoria(RepositorioCategoria repositorio, List<Categoria> categoriasIniciais) {
         this.repositorio = repositorio;
         this.categorias = new ArrayList<>(categoriasIniciais);
     }

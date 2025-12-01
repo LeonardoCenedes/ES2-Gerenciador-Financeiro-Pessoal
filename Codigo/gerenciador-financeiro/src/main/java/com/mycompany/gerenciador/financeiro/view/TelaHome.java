@@ -53,6 +53,13 @@ import javafx.util.StringConverter;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.BarChart;
+import javafx.application.Platform;
 
 /**
  * Tela Home com sidebar e navegação
@@ -77,6 +84,9 @@ public class TelaHome {
     private Conta contaSelecionada = null;
     private Transacao transacaoSelecionada = null;
     private LancamentoRecorrente lancamentoSelecionado = null;
+    private PieChart graficoDespesas = null;
+    private BarChart<String, Number> graficoFluxoCaixa = null;
+    private LineChart<String, Number> graficoSaldoContas = null;
 
     public TelaHome(Stage stage, Usuario usuarioLogado) {
         this.stage = stage;
@@ -97,7 +107,7 @@ public class TelaHome {
             try {
                 controladorLancamento.resolverReferencias(controladorConta, controladorCategoria, usuarioLogado);
                 System.out.println("Referências de lançamentos recorrentes resolvidas!");
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 System.err.println("Erro ao resolver referências dos lançamentos: " + ex.getMessage());
             }
             
@@ -106,7 +116,7 @@ public class TelaHome {
                 controladorLancamento.verificarLancamentosDoDia();
                 controladorLancamento.salvarAoEncerrar();
                 System.out.println("Lançamentos recorrentes verificados com sucesso!");
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 System.err.println("Erro ao verificar lançamentos do dia: " + ex.getMessage());
             }
         } catch (IOException e) {
@@ -121,10 +131,12 @@ public class TelaHome {
                 controladorConta.salvarAoEncerrar();
                 controladorTransacao.salvarAoEncerrar();
                 controladorLancamento.salvarAoEncerrar();
+                controladorCategoria.salvarAoEncerrar();
+                controladorMeta.salvarAoEncerrar();
+                controladorOrcamento.salvarAoEncerrar();
                 System.out.println("Dados salvos com sucesso!");
             } catch (IOException e) {
                 System.err.println("ERRO ao salvar dados no shutdown: " + e.getMessage());
-                e.printStackTrace();
             }
         }));
     }
@@ -146,6 +158,14 @@ public class TelaHome {
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
         scrollPane.setStyle("-fx-background: #1e1e1e; -fx-background-color: #1e1e1e;");
+        
+        // Aplicar CSS personalizado para o scroll
+        try {
+            String scrollCss = getClass().getResource("/styles/scrollbar-dark.css").toExternalForm();
+            scrollPane.getStylesheets().add(scrollCss);
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar CSS do scroll: " + e.getMessage());
+        }
         
         contentArea = new VBox(20);
         contentArea.setPadding(new Insets(30));
@@ -189,10 +209,13 @@ public class TelaHome {
                 controladorUsuario.salvarAoEncerrar();
                 controladorConta.salvarAoEncerrar();
                 controladorTransacao.salvarAoEncerrar();
+                controladorLancamento.salvarAoEncerrar();
+                controladorCategoria.salvarAoEncerrar();
+                controladorMeta.salvarAoEncerrar();
+                controladorOrcamento.salvarAoEncerrar();
                 System.out.println("Dados salvos ao fechar janela!");
             } catch (IOException e) {
                 System.err.println("ERRO ao salvar dados ao fechar: " + e.getMessage());
-                e.printStackTrace();
             }
         });
     }
@@ -244,27 +267,6 @@ public class TelaHome {
         
         titleBar.getChildren().addAll(title, spacer, minimizeBtn, maximizeBtn, closeBtn);
         return titleBar;
-    }
-    
-    private String formatarMoeda(float valor, String moeda) {
-        String simbolo;
-        switch (moeda.toUpperCase()) {
-            case "BRL":
-            case "REAL":
-                simbolo = "R$";
-                break;
-            case "USD":
-            case "DOLAR":
-                simbolo = "$";
-                break;
-            case "EUR":
-            case "EURO":
-                simbolo = "€";
-                break;
-            default:
-                simbolo = moeda;
-        }
-        return String.format("%s %.2f", simbolo, valor);
     }
 
     private VBox criarSidebar() {
@@ -542,7 +544,7 @@ public class TelaHome {
         try {
             List<Conta> contas = controladorConta.buscarContasUsuario(usuarioLogado);
             contaCombo.getItems().addAll(contas);
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             System.err.println("Erro ao carregar contas: " + ex.getMessage());
         }
         
@@ -581,14 +583,83 @@ public class TelaHome {
         
         // Atualizar cards quando mudar a seleção - agora recebe o objeto Conta diretamente
         contaCombo.setOnAction(e -> {
-            Conta contaSelecionada = contaCombo.getValue();
-            atualizarDashboardCards(contaSelecionada, saldoCard, receitasCard, despesasCard);
+            Conta contaSelecionadaLocal = contaCombo.getValue();
+            atualizarDashboardCards(contaSelecionadaLocal, saldoCard, receitasCard, despesasCard);
+            atualizarGraficoDespesas(contaSelecionadaLocal);
+            atualizarGraficoFluxoCaixa(contaSelecionadaLocal);
+            atualizarGraficoSaldoContas();
         });
         
-        contentArea.getChildren().addAll(titulo, subtitulo, contaCombo, cardsBox);
+        // Criar gráfico de despesas por categoria
+        graficoDespesas = criarGraficoDespesas();
+        VBox graficoContainer = new VBox(10);
+        graficoContainer.setPadding(new Insets(20));
+        graficoContainer.setStyle(
+            "-fx-background-color: #1a1a1a;" +
+            "-fx-background-radius: 10;" +
+            "-fx-border-color: #7b2cbf;" +
+            "-fx-border-width: 1.5;" +
+            "-fx-border-radius: 10;"
+        );
+        graficoContainer.setPrefWidth(0);
+        HBox.setHgrow(graficoContainer, javafx.scene.layout.Priority.ALWAYS);
+        
+        Label tituloGrafico = new Label("📊 Despesas por Categoria");
+        tituloGrafico.setFont(Font.font("System", FontWeight.BOLD, 20));
+        tituloGrafico.setTextFill(Color.WHITE);
+        
+        graficoContainer.getChildren().addAll(tituloGrafico, graficoDespesas);
+        
+        // Criar gráfico de fluxo de caixa
+        graficoFluxoCaixa = criarGraficoFluxoCaixa();
+        VBox fluxoContainer = new VBox(10);
+        fluxoContainer.setPadding(new Insets(20));
+        fluxoContainer.setStyle(
+            "-fx-background-color: #1a1a1a;" +
+            "-fx-background-radius: 10;" +
+            "-fx-border-color: #7b2cbf;" +
+            "-fx-border-width: 1.5;" +
+            "-fx-border-radius: 10;"
+        );
+        fluxoContainer.setPrefWidth(0);
+        HBox.setHgrow(fluxoContainer, javafx.scene.layout.Priority.ALWAYS);
+        
+        Label tituloFluxo = new Label("📊 Fluxo de Caixa");
+        tituloFluxo.setFont(Font.font("System", FontWeight.BOLD, 20));
+        tituloFluxo.setTextFill(Color.WHITE);
+        
+        fluxoContainer.getChildren().addAll(tituloFluxo, graficoFluxoCaixa);
+        
+        // HBox para conter os gráficos lado a lado (metade da tela cada)
+        HBox graficosBox = new HBox(20);
+        graficosBox.getChildren().addAll(graficoContainer, fluxoContainer);
+        
+        // Criar gráfico de saldo por conta (linha do tempo)
+        graficoSaldoContas = criarGraficoSaldoContas();
+        VBox saldoContainer = new VBox(10);
+        saldoContainer.setPadding(new Insets(20));
+        saldoContainer.setStyle(
+            "-fx-background-color: #1a1a1a;" +
+            "-fx-background-radius: 10;" +
+            "-fx-border-color: #7b2cbf;" +
+            "-fx-border-width: 1.5;" +
+            "-fx-border-radius: 10;"
+        );
+        saldoContainer.setPrefWidth(Double.MAX_VALUE);
+        
+        Label tituloSaldo = new Label("📈 Saldo por Conta");
+        tituloSaldo.setFont(Font.font("System", FontWeight.BOLD, 20));
+        tituloSaldo.setTextFill(Color.WHITE);
+        
+        saldoContainer.getChildren().addAll(tituloSaldo, graficoSaldoContas);
+        
+        contentArea.getChildren().addAll(titulo, subtitulo, contaCombo, cardsBox, graficosBox, saldoContainer);
         
         // Carregar dados iniciais
         atualizarDashboardCards(null, saldoCard, receitasCard, despesasCard);
+        atualizarGraficoDespesas(null);
+        atualizarGraficoFluxoCaixa(null);
+        atualizarGraficoSaldoContas();
     }
     
     private void atualizarDashboardCards(Conta conta, VBox saldoCard, VBox receitasCard, VBox despesasCard) {
@@ -631,14 +702,14 @@ public class TelaHome {
                 }
             }
             
-            // Atualizar os cards
-            atualizarCardValor(saldoCard, String.format("R$ %.2f", saldoTotal));
-            atualizarCardValor(receitasCard, String.format("R$ %.2f", totalReceitas));
-            atualizarCardValor(despesasCard, String.format("R$ %.2f", totalDespesas));
+            // Atualizar os cards com formatação de moeda
+            String simboloMoeda = conta != null ? obterSimboloMoeda(conta.getMoeda()) : "R$";
+            atualizarCardValor(saldoCard, formatarValor(saldoTotal, simboloMoeda));
+            atualizarCardValor(receitasCard, formatarValor(totalReceitas, simboloMoeda));
+            atualizarCardValor(despesasCard, formatarValor(totalDespesas, simboloMoeda));
             
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             System.err.println("Erro ao atualizar dashboard: " + ex.getMessage());
-            ex.printStackTrace();
         }
     }
     
@@ -649,7 +720,314 @@ public class TelaHome {
             valorLabel.setText(novoValor);
         }
     }
+    
+    private PieChart criarGraficoDespesas() {
+        PieChart pieChart = new PieChart();
+        pieChart.setTitle("");
+        pieChart.setLegendVisible(true);
+        pieChart.setLabelsVisible(true);
+        pieChart.setPrefSize(500, 350);
+        pieChart.setMaxSize(500, 350);
+        pieChart.setMinHeight(350);
+        
+        // Estilizar o gráfico
+        pieChart.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-border-color: transparent;"
+        );
+        
+        // Cores personalizadas para o tema escuro
+        pieChart.setAnimated(true);
+        
+        return pieChart;
+    }
+    
+    private void atualizarGraficoDespesas(Conta conta) {
+        if (graficoDespesas == null) {
+            return;
+        }
+        
+        try {
+            // Usar HashMap com String (nome da categoria) como chave para agregar corretamente
+            Map<String, Float> despesasPorNomeCategoria = new java.util.HashMap<>();
+            
+            if (conta == null) {
+                // Buscar despesas de todas as contas do usuário
+                List<Conta> contas = controladorConta.buscarContasUsuario(usuarioLogado);
+                
+                for (Conta c : contas) {
+                    // Agora requererRelatorioDespesas já retorna Map<String, Float>
+                    Map<String, Float> despesasConta = controladorTransacao.requererRelatorioDespesas(
+                        c, null, TiposTransacao.SAIDA
+                    );
+                    
+                    // Agregar as despesas de todas as contas por nome de categoria
+                    for (Map.Entry<String, Float> entry : despesasConta.entrySet()) {
+                        String nomeCategoria = entry.getKey();
+                        Float valor = entry.getValue();
+                        
+                        despesasPorNomeCategoria.put(nomeCategoria, 
+                            despesasPorNomeCategoria.getOrDefault(nomeCategoria, 0f) + valor);
+                    }
+                }
+            } else {
+                // Buscar despesas apenas da conta selecionada
+                // Agora requererRelatorioDespesas já retorna Map<String, Float> agregado
+                despesasPorNomeCategoria = controladorTransacao.requererRelatorioDespesas(
+                    conta, null, TiposTransacao.SAIDA
+                );
+            }
+            
+            // Limpar dados antigos
+            graficoDespesas.getData().clear();
+            
+            // Adicionar novos dados ao gráfico
+            if (despesasPorNomeCategoria.isEmpty()) {
+                // Mostrar mensagem quando não há dados
+                PieChart.Data semDados = new PieChart.Data("Sem despesas", 1);
+                graficoDespesas.getData().add(semDados);
+                graficoDespesas.setTitle("Nenhuma despesa registrada");
+            } else {
+                graficoDespesas.setTitle("");
+                
+                // Criar dados do gráfico - agora com String (nome da categoria)
+                for (Map.Entry<String, Float> entry : despesasPorNomeCategoria.entrySet()) {
+                    String nomeCategoria = entry.getKey();
+                    Float valor = entry.getValue();
+                    
+                    PieChart.Data data = new PieChart.Data(nomeCategoria, valor);
+                    graficoDespesas.getData().add(data);
+                }
+                
+                // Aplicar cores personalizadas aos segmentos
+                String[] cores = {
+                    "#7b2cbf", "#9d4edd", "#c77dff", "#e0aaff", 
+                    "#ff006e", "#fb5607", "#ffbe0b", "#10b981",
+                    "#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b"
+                };
+                
+                int index = 0;
+                for (PieChart.Data data : graficoDespesas.getData()) {
+                    String cor = cores[index % cores.length];
+                    data.getNode().setStyle("-fx-pie-color: " + cor + ";");
+                    
+                    // Adicionar tooltip com o valor formatado com moeda
+                    final double valorFinal = data.getPieValue();
+                    String simboloMoeda = conta != null ? obterSimboloMoeda(conta.getMoeda()) : "R$";
+                    javafx.scene.control.Tooltip tooltip = new javafx.scene.control.Tooltip(
+                        String.format("%s\n%s", data.getName(), formatarValor((float)valorFinal, simboloMoeda))
+                    );
+                    tooltip.setStyle(
+                        "-fx-background-color: #2a2a2a;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 13px;" +
+                        "-fx-padding: 8px;" +
+                        "-fx-background-radius: 5px;"
+                    );
+                    javafx.scene.control.Tooltip.install(data.getNode(), tooltip);
+                    
+                    index++;
+                }
+            }
+            
+        } catch (IOException ex) {
+            System.err.println("Erro ao atualizar gráfico de despesas: " + ex.getMessage());
+            graficoDespesas.getData().clear();
+            PieChart.Data erro = new PieChart.Data("Erro ao carregar dados", 1);
+            graficoDespesas.getData().add(erro);
+        }
+    }
 
+    private String obterSimboloMoeda(String moeda) {
+        if (moeda == null || moeda.isEmpty()) {
+            return "R$";
+        }
+        // Mapeamento comum de moedas
+        return switch (moeda.toUpperCase()) {
+            case "BRL", "REAL", "R$" -> "R$";
+            case "USD", "DOLAR", "DÓLAR", "DOLLAR" -> "$";
+            case "EUR", "EURO" -> "€";
+            case "GBP", "LIBRA" -> "£";
+            case "JPY", "IENE" -> "¥";
+            default -> moeda; // Retorna a própria string se não reconhecido
+        };
+    }
+    
+    private String formatarValor(float valor, String simboloMoeda) {
+        return String.format("%s %.2f", simboloMoeda, valor);
+    }
+    
+    private BarChart<String, Number> criarGraficoFluxoCaixa() {
+        CategoryAxis xAxis = new CategoryAxis();
+        xAxis.setLabel("Período");
+        
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Valor");
+        
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle("");
+        barChart.setLegendVisible(true);
+        barChart.setPrefSize(500, 350);
+        barChart.setMaxSize(500, 350);
+        barChart.setMinHeight(350);
+        barChart.setAnimated(true);
+        
+        barChart.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-border-color: transparent;"
+        );
+        
+        return barChart;
+    }
+    
+    private void atualizarGraficoFluxoCaixa(Conta conta) {
+        if (graficoFluxoCaixa == null) {
+            return;
+        }
+        
+        try {
+            graficoFluxoCaixa.getData().clear();
+            
+            XYChart.Series<String, Number> serieReceitas = new XYChart.Series<>();
+            serieReceitas.setName("Receitas");
+            
+            XYChart.Series<String, Number> serieDespesas = new XYChart.Series<>();
+            serieDespesas.setName("Despesas");
+            
+            // Agrupar transações por mês
+            Map<String, Float> receitasPorMes = new java.util.TreeMap<>();
+            Map<String, Float> despesasPorMes = new java.util.TreeMap<>();
+            
+            List<Conta> contas = (conta == null) ? controladorConta.buscarContasUsuario(usuarioLogado) : java.util.Arrays.asList(conta);
+            
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MM/yyyy");
+            
+            for (Conta c : contas) {
+                List<Transacao> transacoes = controladorTransacao.buscarPorConta(c);
+                for (Transacao t : transacoes) {
+                    String mes = sdf.format(t.getData());
+                    
+                    if (t.getTipo() == TiposTransacao.ENTRADA) {
+                        receitasPorMes.put(mes, receitasPorMes.getOrDefault(mes, 0f) + t.getValor());
+                    } else if (t.getTipo() == TiposTransacao.SAIDA) {
+                        despesasPorMes.put(mes, despesasPorMes.getOrDefault(mes, 0f) + t.getValor());
+                    }
+                }
+            }
+            
+            // Pegar todos os meses únicos
+            java.util.Set<String> meses = new java.util.TreeSet<>();
+            meses.addAll(receitasPorMes.keySet());
+            meses.addAll(despesasPorMes.keySet());
+            
+            // Adicionar dados ao gráfico
+            for (String mes : meses) {
+                serieReceitas.getData().add(new XYChart.Data<>(mes, receitasPorMes.getOrDefault(mes, 0f)));
+                serieDespesas.getData().add(new XYChart.Data<>(mes, despesasPorMes.getOrDefault(mes, 0f)));
+            }
+            
+            // Supressão do warning de type safety do JavaFX - é seguro
+            graficoFluxoCaixa.getData().addAll(serieReceitas, serieDespesas);
+            
+            // Aplicar cores personalizadas
+            Platform.runLater(() -> {
+                if (serieReceitas.getNode() != null) {
+                    serieReceitas.getNode().setStyle("-fx-bar-fill: #10b981;");
+                }
+                if (serieDespesas.getNode() != null) {
+                    serieDespesas.getNode().setStyle("-fx-bar-fill: #ff006e;");
+                }
+            });
+            
+        } catch (IOException ex) {
+            System.err.println("Erro ao atualizar gráfico de fluxo de caixa: " + ex.getMessage());
+        }
+    }
+    
+    private LineChart<String, Number> criarGraficoSaldoContas() {
+        CategoryAxis xAxis = new CategoryAxis();
+        xAxis.setLabel("Contas");
+        
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Saldo");
+        yAxis.setAutoRanging(true);
+        
+        LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
+        lineChart.setTitle("");
+        lineChart.setLegendVisible(true);
+        lineChart.setPrefSize(Double.MAX_VALUE, 350);
+        lineChart.setMinHeight(350);
+        lineChart.setAnimated(true);
+        lineChart.setCreateSymbols(true);
+        
+        lineChart.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-border-color: transparent;"
+        );
+        
+        return lineChart;
+    }
+    
+    private void atualizarGraficoSaldoContas() {
+        if (graficoSaldoContas == null) {
+            return;
+        }
+        
+        try {
+            graficoSaldoContas.getData().clear();
+            
+            XYChart.Series<String, Number> serieSaldoInicial = new XYChart.Series<>();
+            serieSaldoInicial.setName("Saldo Inicial");
+            
+            XYChart.Series<String, Number> serieSaldoAtual = new XYChart.Series<>();
+            serieSaldoAtual.setName("Saldo Atual");
+            
+            XYChart.Series<String, Number> serieVariacao = new XYChart.Series<>();
+            serieVariacao.setName("Variação");
+            
+            List<Conta> contas = controladorConta.buscarContasUsuario(usuarioLogado);
+            
+            for (Conta conta : contas) {
+                float saldoInicial = conta.getSaldoInicial();
+                float saldoAtual = saldoInicial;
+                
+                List<Transacao> transacoes = controladorTransacao.buscarPorConta(conta);
+                for (Transacao t : transacoes) {
+                    if (t.getTipo() == TiposTransacao.ENTRADA) {
+                        saldoAtual += t.getValor();
+                    } else if (t.getTipo() == TiposTransacao.SAIDA) {
+                        saldoAtual -= t.getValor();
+                    }
+                }
+                
+                float variacao = saldoAtual - saldoInicial;
+                
+                serieSaldoInicial.getData().add(new XYChart.Data<>(conta.getNome(), saldoInicial));
+                serieSaldoAtual.getData().add(new XYChart.Data<>(conta.getNome(), saldoAtual));
+                serieVariacao.getData().add(new XYChart.Data<>(conta.getNome(), variacao));
+            }
+            
+            // Supressão do warning de type safety do JavaFX - é seguro
+            graficoSaldoContas.getData().addAll(serieSaldoInicial, serieSaldoAtual, serieVariacao);
+            
+            // Aplicar cores personalizadas
+            Platform.runLater(() -> {
+                if (serieSaldoInicial.getNode() != null) {
+                    serieSaldoInicial.getNode().setStyle("-fx-stroke: #7b2cbf; -fx-stroke-width: 3px;");
+                }
+                if (serieSaldoAtual.getNode() != null) {
+                    serieSaldoAtual.getNode().setStyle("-fx-stroke: #10b981; -fx-stroke-width: 3px;");
+                }
+                if (serieVariacao.getNode() != null) {
+                    serieVariacao.getNode().setStyle("-fx-stroke: #ff006e; -fx-stroke-width: 3px;");
+                }
+            });
+            
+        } catch (IOException ex) {
+            System.err.println("Erro ao atualizar gráfico de saldo por conta: " + ex.getMessage());
+        }
+    }
+    
     private VBox criarCardResumo(String titulo, String valor, String cor) {
         VBox card = new VBox(10);
         card.setPadding(new Insets(20));
@@ -782,7 +1160,7 @@ public class TelaHome {
                 totalMovimentacao += valor;
             }
             saldoAtual += totalMovimentacao;
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             System.err.println("Erro ao buscar saldo: " + ex.getMessage());
         }
         
@@ -847,19 +1225,13 @@ public class TelaHome {
     }
     
     private String obterIconeTipo(String tipo) {
-        switch (tipo.toLowerCase()) {
-            case "corrente":
-                return "🏦";
-            case "poupança":
-            case "poupanca":
-                return "💰";
-            case "investimento":
-                return "📈";
-            case "carteira":
-                return "👛";
-            default:
-                return "💳";
-        }
+        return switch (tipo.toLowerCase()) {
+            case "corrente" -> "🏦";
+            case "poupança", "poupanca" -> "💰";
+            case "investimento" -> "📈";
+            case "carteira" -> "👛";
+            default -> "💳";
+        };
     }
     
     private void mostrarDialogNovaConta() {
@@ -932,7 +1304,6 @@ public class TelaHome {
                 float saldo = Float.parseFloat(saldoStr);
                 
                 controladorConta.criarConta(nome, tipo, saldo, moeda, usuarioLogado);
-                controladorConta.salvarAoEncerrar();
                 
                 Snackbar.show(rootContainer, "Conta criada com sucesso!", Snackbar.Type.SUCCESS);
                 dialogStage.close();
@@ -1022,7 +1393,6 @@ public class TelaHome {
                 float saldo = Float.parseFloat(saldoStr);
                 
                 controladorConta.editarConta(conta, nome, tipo, saldo);
-                controladorConta.salvarAoEncerrar();
                 
                 Snackbar.show(rootContainer, "Conta atualizada com sucesso!", Snackbar.Type.SUCCESS);
                 dialogStage.close();
@@ -1051,7 +1421,6 @@ public class TelaHome {
     private void excluirConta(Conta conta) {
         try {
             controladorConta.excluirConta(conta);
-            controladorConta.salvarAoEncerrar();
             Snackbar.show(rootContainer, "Conta excluída com sucesso!", Snackbar.Type.SUCCESS);
             mostrarContas();
         } catch (Exception e) {
@@ -1416,7 +1785,6 @@ public class TelaHome {
             toggleBtn.setOnAction(e -> {
                 categoria.setStatus(!categoria.isStatus());
                 try {
-                    controladorCategoria.salvarAoEncerrar();
                     mostrarCategorias();
                     Snackbar.show(rootContainer, "Status atualizado com sucesso!", Snackbar.Type.SUCCESS);
                 } catch (Exception ex) {
@@ -1493,13 +1861,12 @@ public class TelaHome {
                 
                 // Criar nova categoria personalizada (não padrão)
                 controladorCategoria.criarCategoria(nome, false, true);
-                controladorCategoria.salvarAoEncerrar();
                 
                 Snackbar.show(rootContainer, "Categoria criada com sucesso!", Snackbar.Type.SUCCESS);
                 dialogStage.close();
                 mostrarCategorias();
                 
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 Snackbar.show(rootContainer, "Erro ao criar categoria: " + ex.getMessage(), Snackbar.Type.ERROR);
             }
         });
@@ -1604,29 +1971,40 @@ public class TelaHome {
         
         // Barra de progresso
         float progresso = (meta.getValorEconomizadoAtual() / meta.getValor()) * 100;
-        if (progresso > 100) progresso = 100;
+        float progressoCapped = progresso > 100 ? 100 : progresso;
         
-        VBox progressoContainer = new VBox(5);
+        VBox progressoContainer = new VBox(8);
         Label progressoLabel = new Label(String.format("%.1f%% concluído", progresso));
-        progressoLabel.setFont(Font.font("System", FontWeight.NORMAL, 12));
+        progressoLabel.setFont(Font.font("System", FontWeight.BOLD, 13));
         progressoLabel.setTextFill(Color.web("#c77dff"));
         
-        HBox barraBg = new HBox();
+        // Fundo da barra (sempre visível, roxo bem escuro)
+        Region barraBg = new Region();
+        barraBg.setPrefHeight(12);
+        barraBg.setMinHeight(12);
+        barraBg.setMaxHeight(12);
         barraBg.setStyle(
-            "-fx-background-color: #0a0a0a;" +
-            "-fx-background-radius: 5;"
+            "-fx-background-color: #1a0a2e;" +
+            "-fx-background-radius: 6;" +
+            "-fx-border-color: #2d1850;" +
+            "-fx-border-width: 1;" +
+            "-fx-border-radius: 6;"
         );
-        barraBg.setMinHeight(8);
-        barraBg.setMaxHeight(8);
         
-        HBox barraProgress = new HBox();
+        // Barra de progresso (cresce da esquerda pra direita)
+        Region barraProgress = new Region();
+        String corBarra = progresso >= 100 ? "#10b981" : 
+                         progresso >= 75 ? "linear-gradient(to right, #9d4edd, #c77dff)" :
+                         progresso >= 50 ? "linear-gradient(to right, #7b2cbf, #9d4edd)" :
+                         "linear-gradient(to right, #5a1e8c, #7b2cbf)";
+        barraProgress.setMinHeight(12);
+        barraProgress.setMaxHeight(12);
+        barraProgress.setMaxWidth(Region.USE_PREF_SIZE);
         barraProgress.setStyle(
-            "-fx-background-color: linear-gradient(to right, #7b2cbf, #9d4edd);" +
+            "-fx-background-color: " + corBarra + ";" +
             "-fx-background-radius: 5;"
         );
-        barraProgress.setMinHeight(8);
-        barraProgress.setMaxHeight(8);
-        barraProgress.prefWidthProperty().bind(barraBg.widthProperty().multiply(progresso / 100.0));
+        barraProgress.prefWidthProperty().bind(barraBg.widthProperty().multiply(progressoCapped / 100.0));
         
         StackPane barraStack = new StackPane();
         barraStack.getChildren().addAll(barraBg, barraProgress);
@@ -1668,7 +2046,6 @@ public class TelaHome {
                 boolean sucesso = controladorMeta.deletarMeta(meta);
                 
                 if (sucesso) {
-                    controladorMeta.salvarAoEncerrar();
                     mostrarMetas();
                     Snackbar.show(rootContainer, "Meta excluída com sucesso!", Snackbar.Type.SUCCESS);
                 } else {
@@ -1749,7 +2126,6 @@ public class TelaHome {
                 boolean sucesso = controladorMeta.criarMeta(nome, valor, dataLimite, usuarioLogado);
                 
                 if (sucesso) {
-                    controladorMeta.salvarAoEncerrar();
                     Snackbar.show(rootContainer, "Meta criada com sucesso!", Snackbar.Type.SUCCESS);
                     dialogStage.close();
                     mostrarMetas();
@@ -1900,31 +2276,44 @@ public class TelaHome {
         header.getChildren().addAll(icone, info, spacer, valores);
         
         // Barra de progresso
-        VBox progressoContainer = new VBox(5);
-        if (percentual > 100) percentual = 100;
+        float percentualReal = (gastoTotal / orcamento.getValorMaximo()) * 100;
+        float percentualCapped = percentualReal > 100 ? 100 : percentualReal;
         
-        Label progressoLabel = new Label(String.format("%.1f%% do orçamento utilizado", (gastoTotal / orcamento.getValorMaximo()) * 100));
-        progressoLabel.setFont(Font.font("System", FontWeight.NORMAL, 12));
-        progressoLabel.setTextFill(Color.web("#c77dff"));
+        VBox progressoContainer = new VBox(8);
+        Label progressoLabel = new Label(String.format("%.1f%% do orçamento utilizado", percentualReal));
+        progressoLabel.setFont(Font.font("System", FontWeight.BOLD, 13));
+        Color corLabel = percentualReal > 100 ? Color.web("#ff006e") :
+                        percentualReal > 80 ? Color.web("#ffa500") : Color.web("#c77dff");
+        progressoLabel.setTextFill(corLabel);
         
-        HBox barraBg = new HBox();
+        // Fundo da barra (sempre visível, roxo bem escuro)
+        Region barraBg = new Region();
+        barraBg.setPrefHeight(12);
+        barraBg.setMinHeight(12);
+        barraBg.setMaxHeight(12);
         barraBg.setStyle(
-            "-fx-background-color: #0a0a0a;" +
-            "-fx-background-radius: 5;"
+            "-fx-background-color: #1a0a2e;" +
+            "-fx-background-radius: 6;" +
+            "-fx-border-color: #2d1850;" +
+            "-fx-border-width: 1;" +
+            "-fx-border-radius: 6;"
         );
-        barraBg.setMinHeight(8);
-        barraBg.setMaxHeight(8);
         
-        HBox barraProgress = new HBox();
-        String corBarra = (gastoTotal / orcamento.getValorMaximo()) > 1.0 ? "#ff006e" :
-                         (gastoTotal / orcamento.getValorMaximo()) > 0.8 ? "#ffa500" : "#10b981";
+        // Barra de progresso (cresce da esquerda pra direita)
+        Region barraProgress = new Region();
+        String corBarra = percentualReal > 100 ? "linear-gradient(to right, #ff006e, #ff4d8f)" :
+                         percentualReal > 90 ? "linear-gradient(to right, #ff6b35, #ff006e)" :
+                         percentualReal > 75 ? "linear-gradient(to right, #ffa500, #ff8c00)" :
+                         percentualReal > 50 ? "linear-gradient(to right, #10b981, #ffa500)" :
+                         "linear-gradient(to right, #10b981, #20c997)";
+        barraProgress.setMinHeight(12);
+        barraProgress.setMaxHeight(12);
+        barraProgress.setMaxWidth(Region.USE_PREF_SIZE);
         barraProgress.setStyle(
             "-fx-background-color: " + corBarra + ";" +
             "-fx-background-radius: 5;"
         );
-        barraProgress.setMinHeight(8);
-        barraProgress.setMaxHeight(8);
-        barraProgress.prefWidthProperty().bind(barraBg.widthProperty().multiply(percentual / 100.0));
+        barraProgress.prefWidthProperty().bind(barraBg.widthProperty().multiply(percentualCapped / 100.0));
         
         StackPane barraStack = new StackPane();
         barraStack.getChildren().addAll(barraBg, barraProgress);
@@ -1965,7 +2354,6 @@ public class TelaHome {
                 boolean sucesso = controladorOrcamento.deletarOrcamento(orcamento);
                 
                 if (sucesso) {
-                    controladorOrcamento.salvarAoEncerrar();
                     mostrarOrcamentos();
                     Snackbar.show(rootContainer, "Orçamento excluído com sucesso!", Snackbar.Type.SUCCESS);
                 } else {
@@ -2072,7 +2460,6 @@ public class TelaHome {
                 }
                 
                 controladorOrcamento.criarOrcamento(periodo, valor, categoriaSel, usuarioLogado);
-                controladorOrcamento.salvarAoEncerrar();
                 
                 Snackbar.show(rootContainer, "Orçamento criado com sucesso!", Snackbar.Type.SUCCESS);
                 dialogStage.close();
@@ -2080,7 +2467,7 @@ public class TelaHome {
                 
             } catch (NumberFormatException ex) {
                 Snackbar.show(rootContainer, "Valor inválido", Snackbar.Type.ERROR);
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 Snackbar.show(rootContainer, "Erro ao criar: " + ex.getMessage(), Snackbar.Type.ERROR);
             }
         });
@@ -2088,7 +2475,7 @@ public class TelaHome {
         botoesBox.getChildren().addAll(cancelarBtn, salvarBtn);
         dialog.getChildren().addAll(headerBox, categoriaCombo, valorField, periodoPicker, botoesBox);
         
-        Scene dialogScene = new Scene(dialog, 400, 420);
+        Scene dialogScene = new Scene(new StackPane(), 400, 420);
         dialogScene.setFill(Color.TRANSPARENT);
         
         try {
@@ -2257,13 +2644,12 @@ public class TelaHome {
                 boolean sucesso = controladorLancamento.cancelar(lancamento);
                 
                 if (sucesso) {
-                    controladorLancamento.salvarAoEncerrar();
                     mostrarRecorrentes();
                     Snackbar.show(rootContainer, "Lançamento cancelado com sucesso!", Snackbar.Type.SUCCESS);
                 } else {
                     Snackbar.show(rootContainer, "Erro ao cancelar lançamento", Snackbar.Type.ERROR);
                 }
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 Snackbar.show(rootContainer, "Erro ao cancelar: " + ex.getMessage(), Snackbar.Type.ERROR);
             }
         });
@@ -2517,7 +2903,7 @@ public class TelaHome {
                     try {
                         PDFUtil pdfUtil = new PDFUtil();
                         comprovanteBytes = pdfUtil.importarPDF(arquivoComprovante[0].getAbsolutePath());
-                    } catch (Exception ex) {
+                    } catch (IOException ex) {
                         System.err.println("Erro ao importar comprovante: " + ex.getMessage());
                     }
                 }
@@ -2531,8 +2917,6 @@ public class TelaHome {
                     Snackbar.show(rootContainer, "Erro ao criar transação template", Snackbar.Type.ERROR);
                     return;
                 }
-                
-                controladorTransacao.salvarAoEncerrar();
                 
                 // Buscar a transação recém-criada para usar como template
                 List<Transacao> transacoes = controladorTransacao.buscarPorConta(contaSelecionada);
@@ -2556,7 +2940,6 @@ public class TelaHome {
                 );
                 
                 if (sucesso) {
-                    controladorLancamento.salvarAoEncerrar();
                     Snackbar.show(rootContainer, "Lançamento recorrente criado com sucesso!", Snackbar.Type.SUCCESS);
                     dialogStage.close();
                     mostrarRecorrentes();
@@ -2566,7 +2949,7 @@ public class TelaHome {
                 
             } catch (NumberFormatException ex) {
                 Snackbar.show(rootContainer, "Valores inválidos", Snackbar.Type.ERROR);
-            } catch (Exception ex) {
+            } catch (IOException | IllegalArgumentException ex) {
                 Snackbar.show(rootContainer, "Erro ao salvar: " + ex.getMessage(), Snackbar.Type.ERROR);
             }
         });
@@ -2643,9 +3026,24 @@ public class TelaHome {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         
-        Label saldoConta = new Label(String.format("R$ %.2f", contaSelecionada.getSaldoInicial()));
+        // Calcular saldo atual (saldo inicial + transações)
+        float saldoAtual = contaSelecionada.getSaldoInicial();
+        try {
+            List<Transacao> transacoesConta = controladorTransacao.buscarPorConta(contaSelecionada);
+            for (Transacao t : transacoesConta) {
+                if (t.getTipo() == TiposTransacao.ENTRADA) {
+                    saldoAtual += t.getValor();
+                } else {
+                    saldoAtual -= t.getValor();
+                }
+            }
+        } catch (Exception ex) {
+            System.err.println("Erro ao calcular saldo: " + ex.getMessage());
+        }
+        
+        Label saldoConta = new Label(String.format("R$ %.2f", saldoAtual));
         saldoConta.setFont(Font.font("System", FontWeight.BOLD, 28));
-        saldoConta.setTextFill(contaSelecionada.getSaldoInicial() >= 0 ? Color.web("#10b981") : Color.web("#ff006e"));
+        saldoConta.setTextFill(saldoAtual >= 0 ? Color.web("#10b981") : Color.web("#ff006e"));
         
         Button voltarBtn = criarBotaoSecundario("← Voltar");
         voltarBtn.setOnAction(e -> {
@@ -2769,10 +3167,13 @@ public class TelaHome {
         
         // Valor
         String sinal = transacao.getTipo() == TiposTransacao.ENTRADA ? "+" : "-";
+        String corHex = transacao.getTipo() == TiposTransacao.ENTRADA ? "#10b981" : "#ff006e";
         Label valor = new Label(sinal + " R$ " + String.format("%.2f", transacao.getValor()));
-        valor.setFont(Font.font("System", FontWeight.BOLD, 18));
-        Color corValor = transacao.getTipo() == TiposTransacao.ENTRADA ? Color.web("#10b981") : Color.web("#ff006e");
-        valor.setTextFill(corValor);
+        valor.setStyle(
+            "-fx-font-size: 18px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-text-fill: " + corHex + ";"
+        );
         
         // Botão excluir
         Button excluirBtn = new Button("🗑️");
@@ -2797,18 +3198,38 @@ public class TelaHome {
         dialogStage.initOwner(stage);
         dialogStage.initStyle(StageStyle.TRANSPARENT);
         
+        // Container principal do diálogo
+        StackPane rootPane = new StackPane();
+        rootPane.setStyle("-fx-background-color: transparent;");
+        rootPane.setMaxWidth(550);
+        rootPane.setMaxHeight(700);
+        
         VBox dialog = new VBox(25);
         dialog.setPadding(new Insets(35));
+        dialog.setMaxHeight(650);
         dialog.setStyle(
             "-fx-background-color: #1a1a1a;" +
             "-fx-background-radius: 15;" +
             "-fx-border-color: #7b2cbf;" +
             "-fx-border-width: 2;" +
             "-fx-border-radius: 15;" +
-            "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 20, 0, 0, 10);"
+            "-fx-effect: dropshadow(gaussian, rgba(123, 44, 191, 0.6), 25, 0, 0, 10);"
         );
         
-        // Header com ícone e título
+        // ScrollPane para o conteúdo interno
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefViewportHeight(500);
+        scrollPane.setMaxHeight(550);
+        scrollPane.setStyle(
+            "-fx-background: transparent;" +
+            "-fx-background-color: transparent;" +
+            "-fx-border-color: transparent;"
+        );
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        
+        // Header com ícone, título e botão X
         HBox header = new HBox(15);
         header.setAlignment(Pos.CENTER_LEFT);
         
@@ -2820,7 +3241,12 @@ public class TelaHome {
         titulo.setFont(Font.font("System", FontWeight.BOLD, 24));
         titulo.setTextFill(Color.WHITE);
         
-        header.getChildren().addAll(iconeLabel, titulo);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        
+        Button closeBtn = criarBotaoFecharDialog(dialogStage);
+        
+        header.getChildren().addAll(iconeLabel, titulo, spacer, closeBtn);
         
         // Separador
         javafx.scene.shape.Line separador = new javafx.scene.shape.Line();
@@ -2837,17 +3263,13 @@ public class TelaHome {
         // Tipo
         String tipoStr = transacao.getTipo() == TiposTransacao.ENTRADA ? "Entrada" : "Saída";
         Color corTipo = transacao.getTipo() == TiposTransacao.ENTRADA ? Color.web("#10b981") : Color.web("#ff006e");
-        HBox tipoBox = criarLinhaDetalhe("Tipo", tipoStr);
-        ((Label) tipoBox.getChildren().get(1)).setTextFill(corTipo);
+        HBox tipoBox = criarLinhaDetalhe("Tipo", tipoStr, corTipo, FontWeight.BOLD, 15);
         
         // Valor
         String sinal = transacao.getTipo() == TiposTransacao.ENTRADA ? "+ " : "- ";
         String valorStr = sinal + String.format("R$ %.2f", transacao.getValor());
         Color corValor = transacao.getTipo() == TiposTransacao.ENTRADA ? Color.web("#10b981") : Color.web("#ff006e");
-        HBox valorBox = criarLinhaDetalhe("Valor", valorStr);
-        Label lblValor = (Label) valorBox.getChildren().get(1);
-        lblValor.setTextFill(corValor);
-        lblValor.setFont(Font.font("System", FontWeight.BOLD, 18));
+        HBox valorBox = criarLinhaDetalhe("Valor", valorStr, corValor, FontWeight.BOLD, 20);
         
         // Descrição
         HBox descBox = criarLinhaDetalhe("Descrição", 
@@ -2862,8 +3284,7 @@ public class TelaHome {
         
         // Meta (se houver)
         if (transacao.getMetaEconomica() != null) {
-            HBox metaBox = criarLinhaDetalhe("Meta", transacao.getMetaEconomica().getNome());
-            ((Label) metaBox.getChildren().get(1)).setTextFill(Color.web("#9d4edd"));
+            HBox metaBox = criarLinhaDetalhe("Meta", transacao.getMetaEconomica().getNome(), Color.web("#9d4edd"), FontWeight.BOLD, 15);
             detalhes.getChildren().add(metaBox);
         }
         
@@ -2901,7 +3322,7 @@ public class TelaHome {
                         fos.write(transacao.getComprovante());
                     }
                     java.awt.Desktop.getDesktop().open(tempFile);
-                } catch (Exception ex) {
+                } catch (IOException ex) {
                     Snackbar.show(rootContainer, "Erro ao abrir PDF: " + ex.getMessage(), Snackbar.Type.ERROR);
                 }
             });
@@ -2917,10 +3338,28 @@ public class TelaHome {
         HBox btnBox = new HBox(voltarBtn);
         btnBox.setAlignment(Pos.CENTER);
         
-        dialog.getChildren().addAll(header, separador, detalhes, btnBox);
+        // Conteúdo scrollável
+        VBox scrollContent = new VBox(18);
+        scrollContent.getChildren().addAll(detalhes, btnBox);
+        scrollContent.setPadding(new Insets(10));
         
-        Scene dialogScene = new Scene(dialog, 500, 550);
+        scrollPane.setContent(scrollContent);
+        
+        // Adicionar header, separador e scrollPane ao dialog
+        dialog.getChildren().addAll(header, separador, scrollPane);
+        
+        // Adicionar dialog ao rootPane
+        rootPane.getChildren().add(dialog);
+        
+        // Aplicar CSS do scrollbar
+        Scene dialogScene = new Scene(rootPane);
         dialogScene.setFill(Color.TRANSPARENT);
+        
+        try {
+            dialogScene.getStylesheets().add(getClass().getResource("/styles/scrollbar-dark.css").toExternalForm());
+        } catch (Exception ex) {
+            System.err.println("Não foi possível carregar CSS do scrollbar: " + ex.getMessage());
+        }
         
         dialogStage.setScene(dialogScene);
         dialogStage.setResizable(false);
@@ -3016,6 +3455,10 @@ public class TelaHome {
     }
     
     private HBox criarLinhaDetalhe(String label, String valor) {
+        return criarLinhaDetalhe(label, valor, Color.WHITE, FontWeight.NORMAL, 15);
+    }
+    
+    private HBox criarLinhaDetalhe(String label, String valor, Color cor, FontWeight peso, double tamanhoFonte) {
         HBox linha = new HBox(15);
         linha.setAlignment(Pos.CENTER_LEFT);
         linha.setPadding(new Insets(8, 15, 8, 15));
@@ -3029,9 +3472,20 @@ public class TelaHome {
         lblLabel.setTextFill(Color.web("#c77dff"));
         lblLabel.setMinWidth(100);
         
+        // Converter cor para hex string
+        String corHex = String.format("#%02x%02x%02x", 
+            (int)(cor.getRed() * 255),
+            (int)(cor.getGreen() * 255),
+            (int)(cor.getBlue() * 255));
+        
+        String pesoStr = peso == FontWeight.BOLD ? "bold" : "normal";
+        
         Label lblValor = new Label(valor);
-        lblValor.setFont(Font.font("System", FontWeight.NORMAL, 15));
-        lblValor.setTextFill(Color.WHITE);
+        lblValor.setStyle(
+            "-fx-font-size: " + tamanhoFonte + "px;" +
+            "-fx-font-weight: " + pesoStr + ";" +
+            "-fx-text-fill: " + corHex + ";"
+        );
         lblValor.setWrapText(true);
         
         linha.getChildren().addAll(lblLabel, lblValor);
@@ -3210,7 +3664,7 @@ public class TelaHome {
                     try {
                         PDFUtil pdfUtil = new PDFUtil();
                         comprovanteBytes = pdfUtil.importarPDF(arquivoComprovante[0].getAbsolutePath());
-                    } catch (Exception ex) {
+                    } catch (IOException ex) {
                         System.err.println("Erro ao importar comprovante: " + ex.getMessage());
                     }
                 }
@@ -3234,7 +3688,6 @@ public class TelaHome {
                     contaSelecionada,
                     metaTrans
                 );
-                controladorTransacao.salvarAoEncerrar();
                 
                 // O backend já contribui para a meta automaticamente se ela existir
                 
@@ -3244,7 +3697,7 @@ public class TelaHome {
                 
             } catch (NumberFormatException ex) {
                 Snackbar.show(rootContainer, "Valor inválido", Snackbar.Type.ERROR);
-            } catch (Exception ex) {
+            } catch (IOException | IllegalArgumentException ex) {
                 Snackbar.show(rootContainer, "Erro ao salvar: " + ex.getMessage(), Snackbar.Type.ERROR);
             }
         });
@@ -3272,10 +3725,9 @@ public class TelaHome {
     private void excluirTransacao(Transacao transacao) {
         try {
             controladorTransacao.excluirTransacao(transacao);
-            controladorTransacao.salvarAoEncerrar();
             Snackbar.show(rootContainer, "Transação excluída com sucesso!", Snackbar.Type.SUCCESS);
             mostrarTransacoes();
-        } catch (Exception e) {
+        } catch (IOException e) {
             Snackbar.show(rootContainer, "Erro ao excluir: " + e.getMessage(), Snackbar.Type.ERROR);
         }
     }
@@ -3310,7 +3762,7 @@ public class TelaHome {
                     Snackbar.show(rootContainer, "Erro ao gerar PDF", Snackbar.Type.ERROR);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             Snackbar.show(rootContainer, "Erro ao gerar extrato: " + e.getMessage(), Snackbar.Type.ERROR);
         }
     }
@@ -3350,6 +3802,10 @@ public class TelaHome {
             controladorUsuario.salvarAoEncerrar();
             controladorConta.salvarAoEncerrar();
             controladorTransacao.salvarAoEncerrar();
+            controladorLancamento.salvarAoEncerrar();
+            controladorCategoria.salvarAoEncerrar();
+            controladorMeta.salvarAoEncerrar();
+            controladorOrcamento.salvarAoEncerrar();
             
             // Voltar para tela de login (nova instância com dados recarregados)
             TelaLogin telaLogin = new TelaLogin(stage);

@@ -1,6 +1,8 @@
 package com.mycompany.gerenciador.financeiro;
 
-// import com.mycompany.gerenciador.financeiro.view.TelaLogin;
+import com.mycompany.gerenciador.financeiro.view.App;
+
+import javafx.application.Application;
 
 /**
  * Classe principal do sistema Gerenciador Financeiro Pessoal.
@@ -10,10 +12,6 @@ package com.mycompany.gerenciador.financeiro;
 public class GerenciadorFinanceiro {
     
     public static void main(String[] args) {
-        System.out.println("Gerenciador Financeiro - Telas em reconstrução");
-        System.out.println("As telas foram deletadas e serão recriadas posteriormente.");
-        // java.awt.EventQueue.invokeLater(() -> {
-        //     new TelaLogin().setVisible(true);
-        // });
+        Application.launch(App.class, args);
     }
 }

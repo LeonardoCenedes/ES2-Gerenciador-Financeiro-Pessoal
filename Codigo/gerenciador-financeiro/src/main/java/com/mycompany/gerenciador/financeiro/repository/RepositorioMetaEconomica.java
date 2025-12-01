@@ -16,24 +16,24 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.mycompany.gerenciador.financeiro.model.Categoria;
-import com.mycompany.gerenciador.financeiro.model.Orcamento;
+import com.mycompany.gerenciador.financeiro.model.MetaEconomica;
 import com.mycompany.gerenciador.financeiro.model.Usuario;
+import com.mycompany.gerenciador.financeiro.util.DataPathResolver;
 
 /**
- * Repositório para persistência de orçamentos em arquivo texto
+ * Repositório para persistência de metas econômicas em arquivo texto
  * Padrão In-Memory Cache: carrega tudo na inicialização, salva tudo ao encerrar
  * 
  * @author Laís Isabella
  */
-public class OrcamentoRepositoryTxt implements Repository<Orcamento> {
+public class RepositorioMetaEconomica implements Repositorio<MetaEconomica> {
     
     private static final String DIRETORIO = "data";
-    private static final String ARQUIVO = "data/orcamentos.txt";
+    private static final String ARQUIVO = DataPathResolver.getFilePath("metas_economicas.txt");
     private static final String SEPARADOR = ";";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
-    public OrcamentoRepositoryTxt() {
+    public RepositorioMetaEconomica() {
         criarDiretorioSeNaoExistir();
     }
 
@@ -44,23 +44,24 @@ public class OrcamentoRepositoryTxt implements Repository<Orcamento> {
         }
     }
 
-    private String formatarOrcamentoParaLinha(Orcamento orcamento) {
-        return DATE_FORMAT.format(orcamento.getPeriodo()) + SEPARADOR
-                + orcamento.getValorMaximo() + SEPARADOR
-                + orcamento.getCategoria().getNome() + SEPARADOR
-                + orcamento.getUsuario().getEmail();
+    private String formatarMetaParaLinha(MetaEconomica meta) {
+        return meta.getNome() + SEPARADOR
+                + meta.getValor() + SEPARADOR
+                + DATE_FORMAT.format(meta.getDataLimite()) + SEPARADOR
+                + meta.getValorEconomizadoAtual() + SEPARADOR
+                + meta.getUsuario().getEmail();
     }
 
     /**
-     * Carrega todos os orçamentos do arquivo para memória
+     * Carrega todas as metas econômicas do arquivo para memória
      */
     @Override
-    public List<Orcamento> carregarTodos() throws IOException {
-        List<Orcamento> orcamentos = new ArrayList<>();
+    public List<MetaEconomica> carregarTodos() throws IOException {
+        List<MetaEconomica> metas = new ArrayList<>();
         File arquivo = new File(ARQUIVO);
 
         if (!arquivo.exists()) {
-            return orcamentos;
+            return metas;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(ARQUIVO))) {
@@ -68,46 +69,43 @@ public class OrcamentoRepositoryTxt implements Repository<Orcamento> {
             while ((linha = reader.readLine()) != null) {
                 if (!linha.trim().isEmpty()) {
                     try {
-                        Orcamento orcamento = parsearLinha(linha);
-                        orcamentos.add(orcamento);
+                        MetaEconomica meta = parsearLinha(linha);
+                        metas.add(meta);
                     } catch (ParseException e) {
-                        // Ignora linhas com erro de formatação
                         System.err.println("Erro ao parsear linha: " + linha);
                     }
                 }
             }
         }
 
-        return orcamentos;
+        return metas;
     }
 
-    // Converte uma linha do arquivo em Orcamento
-    // Formato: periodo;valorMaximo;categoriaNome;usuarioEmail
-    private Orcamento parsearLinha(String linha) throws ParseException {
+    // Converte uma linha do arquivo em MetaEconomica
+    // Formato: nome;valor;dataLimite;valorEconomizadoAtual;usuarioEmail
+    private MetaEconomica parsearLinha(String linha) throws ParseException {
         String[] partes = linha.split(SEPARADOR);
 
-        Date periodo = DATE_FORMAT.parse(partes[0]);
-        float valorMaximo = Float.parseFloat(partes[1]);
-        
-        // Cria objetos Categoria e Usuario apenas com informações básicas
-        Categoria categoria = new Categoria();
-        categoria.setNome(partes[2]);
+        String nome = partes[0];
+        float valor = Float.parseFloat(partes[1]);
+        Date dataLimite = DATE_FORMAT.parse(partes[2]);
+        float valorEconomizadoAtual = Float.parseFloat(partes[3]);
         
         Usuario usuario = new Usuario();
-        usuario.setEmail(partes[3]);
+        usuario.setEmail(partes[4]);
 
-        return new Orcamento(periodo, valorMaximo, categoria, usuario);
+        return new MetaEconomica(nome, valor, dataLimite, valorEconomizadoAtual, usuario);
     }
 
     /**
-     * Salva todos os orçamentos da memória para o arquivo
+     * Salva todas as metas econômicas da memória para o arquivo
      * Sobrescreve o arquivo completamente
      */
     @Override
-    public void salvarTodos(List<Orcamento> orcamentos) throws IOException {
+    public void salvarTodos(List<MetaEconomica> metas) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO, false))) {
-            for (Orcamento orcamento : orcamentos) {
-                String linha = formatarOrcamentoParaLinha(orcamento);
+            for (MetaEconomica meta : metas) {
+                String linha = formatarMetaParaLinha(meta);
                 writer.write(linha);
                 writer.newLine();
             }

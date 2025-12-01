@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mycompany.gerenciador.financeiro.model.Usuario;
+import com.mycompany.gerenciador.financeiro.util.DataPathResolver;
 
 /**
  * Repositório para persistência de usuários em arquivo texto
@@ -17,13 +18,13 @@ import com.mycompany.gerenciador.financeiro.model.Usuario;
  * 
  * @author Laís Isabella
  */
-public class UsuarioRepositoryTxt implements Repository<Usuario> {
+public class RepositorioUsuario implements Repositorio<Usuario> {
     
-    private static final String DIRETORIO = "data";
-    private static final String ARQUIVO = "data/usuarios.txt";
+    private static final String ARQUIVO = DataPathResolver.getFilePath("usuarios.txt");
     private static final String SEPARADOR = ";";
+    private static final String DIRETORIO = DataPathResolver.getDataPath();
 
-    public UsuarioRepositoryTxt() {
+    public RepositorioUsuario() {
         criarDiretorioSeNaoExistir();
     }
     

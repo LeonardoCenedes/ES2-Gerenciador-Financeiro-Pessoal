@@ -11,7 +11,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Separator;
@@ -137,12 +136,6 @@ public class TelaLogin {
         loginButton = criarBotaoPrimario("Entrar");
         loginButton.setOnAction(e -> realizarLogin());
         
-        // Link "Esqueceu a senha?"
-        Hyperlink esqueceuSenha = new Hyperlink("Esqueceu a senha?");
-        esqueceuSenha.setFont(Font.font("Segoe UI", 12));
-        esqueceuSenha.setTextFill(Color.web("#9d4edd"));
-        esqueceuSenha.setOnAction(e -> mostrarInfo("Em breve", "Funcionalidade de recuperação de senha em desenvolvimento"));
-        
         // Linha com "ou"
         HBox ouBox = criarLinhaOu();
         
@@ -161,7 +154,6 @@ public class TelaLogin {
             separador,
             emailBox,
             senhaBox,
-            esqueceuSenha,
             loginButton,
             ouBox,
             cadastroButton
@@ -369,14 +361,6 @@ public class TelaLogin {
     private void mostrarMensagem(String texto, String tipo) {
         Snackbar.Type snackbarType = tipo.equals("erro") ? Snackbar.Type.ERROR : Snackbar.Type.SUCCESS;
         Snackbar.show(rootContainer, texto, snackbarType);
-    }
-
-    private void mostrarInfo(String titulo, String mensagem) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensagem);
-        alert.showAndWait();
     }
 
     private void mostrarErro(String titulo, String mensagem) {

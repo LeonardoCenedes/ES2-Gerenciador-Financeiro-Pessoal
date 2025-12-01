@@ -10,7 +10,7 @@ import java.util.List;
 
 import com.mycompany.gerenciador.financeiro.model.Conta;
 import com.mycompany.gerenciador.financeiro.model.Usuario;
-import com.mycompany.gerenciador.financeiro.repository.ContaRepositoryTxt;
+import com.mycompany.gerenciador.financeiro.repository.RepositorioConta;
 
 /**
  *
@@ -19,14 +19,14 @@ import com.mycompany.gerenciador.financeiro.repository.ContaRepositoryTxt;
 public class CatalogoContas {
 
     private final List<Conta> contas;
-    private final ContaRepositoryTxt repositorio;
+    private final RepositorioConta repositorio;
 
     /**
      * Construtor padrão - cria Repository e carrega dados
      * Cadeia de construção OO: Catalog cria Repository
      */
     public CatalogoContas() throws IOException {
-        this.repositorio = new ContaRepositoryTxt();
+        this.repositorio = new RepositorioConta();
         this.contas = new ArrayList<>(repositorio.carregarTodos());
     }
 

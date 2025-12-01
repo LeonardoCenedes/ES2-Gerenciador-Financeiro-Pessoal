@@ -18,6 +18,7 @@ import java.util.List;
 
 import com.mycompany.gerenciador.financeiro.model.LancamentoRecorrente;
 import com.mycompany.gerenciador.financeiro.model.Periodicidade;
+import com.mycompany.gerenciador.financeiro.util.DataPathResolver;
 
 /**
  * Repositório para persistência de lançamentos recorrentes em arquivo texto
@@ -25,12 +26,12 @@ import com.mycompany.gerenciador.financeiro.model.Periodicidade;
  * Formato: descricao;valor;periodicidade;dataInicio;numeroOcorrencias;proximaData;contaNome;categoriaNome
  * @author Laís Isabella
  */
-public class LancamentoRecorrenteRepositoryTxt implements Repository<LancamentoRecorrente> {
+public class RepositorioLancamentoRecorrente implements Repositorio<LancamentoRecorrente> {
     
-    private static final String FILE_PATH = "data/lancamentos_recorrentes.txt";
+    private static final String FILE_PATH = DataPathResolver.getFilePath("lancamentos_recorrentes.txt");
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
-    public LancamentoRecorrenteRepositoryTxt() {
+    public RepositorioLancamentoRecorrente() {
         criarDiretorioSeNaoExistir();
     }
 
